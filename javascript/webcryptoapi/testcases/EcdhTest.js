@@ -42,16 +42,12 @@ var Ecdh = function() {};
  * @return {!Promise}
  */
 Ecdh.generateKey = function(curveName) {
-  return window.crypto.subtle.generateKey(
-    {
-        name: 'ECDH',
-        namedCurve: curveName,
-    },
-    true,
-    ['deriveKey', 'deriveBits']
-  );
+  return window.crypto.subtle.generateKey({
+    name : 'ECDH',
+    namedCurve : curveName,
+  },
+                                          true, [ 'deriveKey', 'deriveBits' ]);
 };
-
 
 /**
  * Imports a ECDH key from the given key data.
@@ -61,18 +57,12 @@ Ecdh.generateKey = function(curveName) {
  * @return {!Promise}
  */
 Ecdh.importKey = function(keyData, usages) {
-  return window.crypto.subtle.importKey(
-    "jwk",
-    keyData,
-    {
-        name: 'ECDH',
-        namedCurve: keyData['crv'],
-    },
-    true,
-    usages
-  );
+  return window.crypto.subtle.importKey("jwk", keyData, {
+    name : 'ECDH',
+    namedCurve : keyData['crv'],
+  },
+                                        true, usages);
 };
-
 
 /**
  * Exports the given ECDSA key as a JSON object.
@@ -80,10 +70,8 @@ Ecdh.importKey = function(keyData, usages) {
  *
  * @return {!Promise}
  */
-Ecdh.exportKey = function(key) {
-  return window.crypto.subtle.exportKey("jwk", key);
-};
-
+Ecdh.exportKey = function(
+    key) { return window.crypto.subtle.exportKey("jwk", key); };
 
 /**
  * Derives bits from a public key and a private key.
@@ -94,16 +82,12 @@ Ecdh.exportKey = function(key) {
  * @return {!Promise}
  */
 Ecdh.deriveBits = function(pubKey, privKey, bitLen) {
-  return window.crypto.subtle.deriveBits(
-    {
-        name: 'ECDH',
-        public: pubKey,
-    },
-    privKey,
-    bitLen
-  );
+  return window.crypto.subtle.deriveBits({
+    name : 'ECDH',
+    public : pubKey,
+  },
+                                         privKey, bitLen);
 };
-
 
 /**
  * Tests ECDH key derivation. The test case's parameters are passed
@@ -114,40 +98,47 @@ Ecdh.deriveBits = function(pubKey, privKey, bitLen) {
 Ecdh.testKeyDerivation = function() {
   tc = this;
   var sk, pk;
-  var promise = new Promise(function(resolve, reject){
-    Ecdh.importKey(tc.privKeyData, ['deriveBits']).then(function(key){
-      sk = key;
-      Ecdh.importKey(tc.pubKeyData, []).then(function(key){
-        pk = key;
-        Ecdh.deriveBits(pk, sk, tc.sharedKeyLen).then(function(sharedKey){
-          if (tc.result == 'invalid') {
-            reject('Failed on test case ' + tc.id);
+  var promise = new Promise(function(resolve, reject) {
+    Ecdh.importKey(tc.privKeyData, [ 'deriveBits' ])
+        .then(function(key) {
+          sk = key;
+          Ecdh.importKey(tc.pubKeyData, [])
+              .then(function(key) {
+                pk = key;
+                Ecdh.deriveBits(pk, sk, tc.sharedKeyLen)
+                    .then(function(sharedKey) {
+                      if (tc.result == 'invalid') {
+                        reject('Failed on test case ' + tc.id);
+                      }
+                      var hexSharedKey = TestUtil.arrayBufferToHex(sharedKey);
+                      if (hexSharedKey != tc.sharedKey) {
+                        reject('Failed on test case ' + tc.id);
+                      }
+                      resolve();
+                    })
+                    .catch(function(err) {
+                      if (tc.result == 'valid') {
+                        reject('Unexpected exception on test case ' + tc.id +
+                               ": " + err);
+                      }
+                      resolve();
+                    });
+              })
+              .catch(function(err) {
+                if (tc.result == 'valid') {
+                  reject('Failed to import public key: ' + err);
+                }
+                resolve();
+              });
+        })
+        .catch(function(err) {
+          // Allow skipping P-256K curve since this curve is not yet supported
+          // by most implementations.
+          if (tc.privKeyData['crv'] == 'P-256K') {
+            resolve();
           }
-          var hexSharedKey = TestUtil.arrayBufferToHex(sharedKey);
-          if (hexSharedKey != tc.sharedKey) {
-            reject('Failed on test case ' + tc.id);
-          }
-          resolve();
-        }).catch(function(err) {
-          if (tc.result == 'valid') {
-            reject('Unexpected exception on test case ' + tc.id + ": " + err);
-          }
-          resolve();
+          reject('Failed to import private key ' + tc.id + ":" + err);
         });
-      }).catch(function(err) {
-        if (tc.result == 'valid') {
-          reject('Failed to import public key: ' + err);
-        }
-        resolve();
-      });
-    }).catch(function(err) {
-      // Allow skipping P-256K curve since this curve is not yet supported
-      // by most implementations.
-      if (tc.privKeyData['crv'] == 'P-256K') {
-        resolve();
-      }
-      reject('Failed to import private key ' +tc.id + ":"  + err);
-    });
   });
   return promise;
 };
@@ -165,7 +156,7 @@ var EcdhTestCase = function(id, privKeyData, pubKeyData, sharedKey, result) {
   this.privKeyData = privKeyData;
   this.pubKeyData = pubKeyData;
   this.sharedKey = sharedKey;
-  this.sharedKeyLen = sharedKey.length/2*8;
+  this.sharedKeyLen = sharedKey.length / 2 * 8;
   this.result = result;
 };
 
@@ -182,7 +173,7 @@ function testEcdhVectors() {
     for (var j = 0; j < tg['tests'].length; j++) {
       tc = tg['tests'][j];
       var test = new EcdhTestCase(tc['tcId'], tc['private'], tc['public'],
-          tc['shared'], tc['result']);
+                                  tc['shared'], tc['result']);
       testCase.addNewTest(tc['tcId'], Ecdh.testKeyDerivation, test);
     }
   }

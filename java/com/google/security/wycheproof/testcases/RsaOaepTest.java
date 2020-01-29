@@ -58,56 +58,60 @@ public class RsaOaepTest {
 
   protected static void printParameters(AlgorithmParameterSpec params) {
     if (params instanceof OAEPParameterSpec) {
-      OAEPParameterSpec oaepParams = (OAEPParameterSpec) params;
+      OAEPParameterSpec oaepParams = (OAEPParameterSpec)params;
       System.out.println("OAEPParameterSpec");
       System.out.println("digestAlgorithm:" + oaepParams.getDigestAlgorithm());
       System.out.println("mgfAlgorithm:" + oaepParams.getMGFAlgorithm());
       printParameters(oaepParams.getMGFParameters());
     } else if (params instanceof MGF1ParameterSpec) {
-      MGF1ParameterSpec mgf1Params = (MGF1ParameterSpec) params;
+      MGF1ParameterSpec mgf1Params = (MGF1ParameterSpec)params;
       System.out.println("MGF1ParameterSpec");
       System.out.println("digestAlgorithm:" + mgf1Params.getDigestAlgorithm());
     } else {
       System.out.println(params.toString());
-    } 
+    }
   }
-  
+
   /**
-   * This is not a real test. The JCE algorithm names only specify one hash algorithm. But OAEP
-   * uses two hases. One hash algorithm is used to hash the labels. The other hash algorithm is
-   * used for the mask generation function.
+   * This is not a real test. The JCE algorithm names only specify one hash
+   * algorithm. But OAEP uses two hases. One hash algorithm is used to hash the
+   * labels. The other hash algorithm is used for the mask generation function.
    *
-   * <p>Different provider use different default values for the hash function that is not specified
-   * in the algorithm name. Jdk uses mgfsha1 as default. BouncyCastle and Conscrypt use the same
-   * hash for labels and mgf. Every provider allows to specify all the parameters using 
-   * an OAEPParameterSpec instance.
+   * <p>Different provider use different default values for the hash function
+   * that is not specified in the algorithm name. Jdk uses mgfsha1 as default.
+   * BouncyCastle and Conscrypt use the same hash for labels and mgf. Every
+   * provider allows to specify all the parameters using an OAEPParameterSpec
+   * instance.
    *
-   * <p>This test simply tries a number of algorithm names for RSA-OAEP and prints the OAEP
-   * parameters for the case where no OAEPParameterSpec is used.
+   * <p>This test simply tries a number of algorithm names for RSA-OAEP and
+   * prints the OAEP parameters for the case where no OAEPParameterSpec is used.
    */
-  // TODO(bleichen): jdk11 will also add parameters to the RSA keys. This will need more tests.
+  // TODO(bleichen): jdk11 will also add parameters to the RSA keys. This will
+  // need more tests.
   @Test
   public void testDefaults() throws Exception {
     String pubKey =
         "30820122300d06092a864886f70d01010105000382010f003082010a02820101"
-            + "00bdf90898577911c71c4d9520c5f75108548e8dfd389afdbf9c997769b8594e"
-            + "7dc51c6a1b88d1670ec4bb03fa550ba6a13d02c430bfe88ae4e2075163017f4d"
-            + "8926ce2e46e068e88962f38112fc2dbd033e84e648d4a816c0f5bd89cadba0b4"
-            + "d6cac01832103061cbb704ebacd895def6cff9d988c5395f2169a6807207333d"
-            + "569150d7f569f7ebf4718ddbfa2cdbde4d82a9d5d8caeb467f71bfc0099b0625"
-            + "a59d2bad12e3ff48f2fd50867b89f5f876ce6c126ced25f28b1996ee21142235"
-            + "fb3aef9fe58d9e4ef6e4922711a3bbcd8adcfe868481fd1aa9c13e5c658f5172"
-            + "617204314665092b4d8dca1b05dc7f4ecd7578b61edeb949275be8751a5a1fab"
-            + "c30203010001";
+        + "00bdf90898577911c71c4d9520c5f75108548e8dfd389afdbf9c997769b8594e"
+        + "7dc51c6a1b88d1670ec4bb03fa550ba6a13d02c430bfe88ae4e2075163017f4d"
+        + "8926ce2e46e068e88962f38112fc2dbd033e84e648d4a816c0f5bd89cadba0b4"
+        + "d6cac01832103061cbb704ebacd895def6cff9d988c5395f2169a6807207333d"
+        + "569150d7f569f7ebf4718ddbfa2cdbde4d82a9d5d8caeb467f71bfc0099b0625"
+        + "a59d2bad12e3ff48f2fd50867b89f5f876ce6c126ced25f28b1996ee21142235"
+        + "fb3aef9fe58d9e4ef6e4922711a3bbcd8adcfe868481fd1aa9c13e5c658f5172"
+        + "617204314665092b4d8dca1b05dc7f4ecd7578b61edeb949275be8751a5a1fab"
+        + "c30203010001";
     KeyFactory kf;
     kf = KeyFactory.getInstance("RSA");
-    X509EncodedKeySpec x509keySpec = new X509EncodedKeySpec(TestUtil.hexToBytes(pubKey));
+    X509EncodedKeySpec x509keySpec =
+        new X509EncodedKeySpec(TestUtil.hexToBytes(pubKey));
     PublicKey key = kf.generatePublic(x509keySpec);
     for (String oaepName : OaepAlgorithmNames) {
       try {
         Cipher c = Cipher.getInstance(oaepName);
         c.init(Cipher.ENCRYPT_MODE, key);
-        System.out.println("Algorithm " + oaepName + " uses the following defaults");
+        System.out.println("Algorithm " + oaepName +
+                           " uses the following defaults");
         AlgorithmParameters params = c.getParameters();
         printParameters(params.getParameterSpec(OAEPParameterSpec.class));
       } catch (NoSuchAlgorithmException ex) {
@@ -117,25 +121,30 @@ public class RsaOaepTest {
   }
 
   /** Convenience mehtod to get a String from a JsonObject */
-  protected static String getString(JsonObject object, String name) throws Exception {
+  protected static String getString(JsonObject object, String name)
+      throws Exception {
     return object.get(name).getAsString();
   }
 
   /** Convenience method to get a byte array from a JsonObject */
-  protected static byte[] getBytes(JsonObject object, String name) throws Exception {
+  protected static byte[] getBytes(JsonObject object, String name)
+      throws Exception {
     return JsonUtil.asByteArray(object.get(name));
   }
 
   /**
    * Get a PublicKey from a JsonObject.
    *
-   * <p>object contains the key in multiple formats: "key" : elements of the public key "keyDer":
-   * the key in ASN encoding encoded hexadecimal "keyPem": the key in Pem format encoded hexadecimal
-   * The test can use the format that is most convenient.
+   * <p>object contains the key in multiple formats: "key" : elements of the
+   * public key "keyDer": the key in ASN encoding encoded hexadecimal "keyPem":
+   * the key in Pem format encoded hexadecimal The test can use the format that
+   * is most convenient.
    */
-  // This is a false positive, since errorprone cannot track values passed into a method.
+  // This is a false positive, since errorprone cannot track values passed into
+  // a method.
   @SuppressWarnings("InsecureCryptoUsage")
-  protected static PrivateKey getPrivateKey(JsonObject object) throws Exception {
+  protected static PrivateKey getPrivateKey(JsonObject object)
+      throws Exception {
     KeyFactory kf;
     kf = KeyFactory.getInstance("RSA");
     byte[] encoded = TestUtil.hexToBytes(getString(object, "privateKeyPkcs8"));
@@ -143,14 +152,16 @@ public class RsaOaepTest {
     return kf.generatePrivate(keySpec);
   }
 
-  protected static String getOaepAlgorithmName(JsonObject group) throws Exception {
+  protected static String getOaepAlgorithmName(JsonObject group)
+      throws Exception {
     String mgf = getString(group, "mgf");
     String mgfSha = getString(group, "mgfSha");
     return "RSA/ECB/OAEPwith" + mgfSha + "and" + mgf + "Padding";
   }
 
   protected static OAEPParameterSpec getOaepParameters(JsonObject group,
-                                                       JsonObject test) throws Exception {
+                                                       JsonObject test)
+      throws Exception {
     String sha = getString(group, "sha");
     String mgf = getString(group, "mgf");
     String mgfSha = getString(group, "mgfSha");
@@ -158,10 +169,10 @@ public class RsaOaepTest {
     if (test.has("label")) {
       p = new PSource.PSpecified(getBytes(test, "label"));
     }
-    return new OAEPParameterSpec(sha, mgf, new MGF1ParameterSpec(mgfSha), p); 
+    return new OAEPParameterSpec(sha, mgf, new MGF1ParameterSpec(mgfSha), p);
   }
 
-  /** 
+  /**
    * Tests the signature verification with test vectors in a given JSON file.
    *
    * <p> Example format for test vectors
@@ -171,7 +182,7 @@ public class RsaOaepTest {
    *   ...
    *   "testGroups" : [
    *     {
-   *       "d" : "...", 
+   *       "d" : "...",
    *       "e" : "10001",
    *       "n" : "...",
    *       "keysize" : 2048,
@@ -186,7 +197,7 @@ public class RsaOaepTest {
    *           "tcId" : 1,
    *           "comment" : "",
    *           "msg" : "30313233343030",
-   *           "ct" : "...", 
+   *           "ct" : "...",
    *           "label" : "",
    *           "result" : "valid",
    *           "flags" : [],
@@ -194,14 +205,15 @@ public class RsaOaepTest {
    *        ...
    *
    * @param filename the filename of the test vectors
-   * @param allowSkippingKeys if true then keys that cannot be constructed will not fail the test.
-   *        Most of the tests below are using allowSkippingKeys == false. The reason for doing this
-   *        is that providers have distinctive defaults. E.g., no OAEPParameterSpec is given then
-   *        BouncyCastle and Conscrypt use the same hash function for hashing the label and for the
-   *        mask generation function, while jdk uses MGF1SHA1. This is unfortunate and probably
-   *        difficult to fix. Hence, the tests below simply require that providers support each
-   *        others default parameters under the assumption that the OAEPParameterSpec is fully
-   *        specified.
+   * @param allowSkippingKeys if true then keys that cannot be constructed will
+   *not fail the test. Most of the tests below are using allowSkippingKeys ==
+   *false. The reason for doing this is that providers have distinctive
+   *defaults. E.g., no OAEPParameterSpec is given then BouncyCastle and
+   *Conscrypt use the same hash function for hashing the label and for the mask
+   *generation function, while jdk uses MGF1SHA1. This is unfortunate and
+   *probably difficult to fix. Hence, the tests below simply require that
+   *providers support each others default parameters under the assumption that
+   *the OAEPParameterSpec is fully specified.
    **/
   public void testOaep(String filename, boolean allowSkippingKeys)
       throws Exception {
@@ -213,13 +225,10 @@ public class RsaOaepTest {
     String expectedSchema = "rsaes_oaep_decrypt_schema.json";
     String actualSchema = getString(test, "schema");
     if (!expectedSchema.equals(actualSchema)) {
-      System.out.println(
-          "Expecting test vectors with schema "
-              + expectedSchema
-              + " found vectors with schema "
-              + actualSchema
-              + " generatorVersion:"
-              + generatorVersion);
+      System.out.println("Expecting test vectors with schema " +
+                         expectedSchema + " found vectors with schema " +
+                         actualSchema +
+                         " generatorVersion:" + generatorVersion);
     }
 
     int numTests = test.get("numberOfTests").getAsInt();
@@ -256,8 +265,9 @@ public class RsaOaepTest {
         } catch (GeneralSecurityException ex) {
           decrypted = null;
         } catch (Exception ex) {
-          // Other exceptions (i.e. unchecked exceptions) are considered as error
-          // since a third party should never be able to cause such exceptions.
+          // Other exceptions (i.e. unchecked exceptions) are considered as
+          // error since a third party should never be able to cause such
+          // exceptions.
           System.out.printf("Decryption throws %s. filename:%s tcId:%d ct:%s\n",
                             ex.toString(), filename, tcid, ciphertextHex);
           decrypted = null;
@@ -267,9 +277,9 @@ public class RsaOaepTest {
           // errors++;
         }
         if (decrypted == null && result.equals("valid")) {
-            System.out.printf(
-                "Valid ciphertext not decrypted. filename:%s tcId:%d ct:%s\n",
-                filename, tcid, ciphertextHex);
+          System.out.printf(
+              "Valid ciphertext not decrypted. filename:%s tcId:%d ct:%s\n",
+              filename, tcid, ciphertextHex);
           errors++;
         } else if (decrypted != null) {
           String decryptedHex = TestUtil.bytesToHex(decrypted);
@@ -277,19 +287,20 @@ public class RsaOaepTest {
             System.out.printf(
                 "Invalid ciphertext decrypted. filename:%s tcId:%d expected:%s decrypted:%s\n",
                 filename, tcid, messageHex, decryptedHex);
-             errors++;
+            errors++;
           } else if (!decryptedHex.equals(messageHex)) {
             System.out.printf(
                 "Incorrect decryption. filename:%s tcId:%d expected:%s decrypted:%s\n",
                 filename, tcid, messageHex, decryptedHex);
-             errors++;
+            errors++;
           }
         }
       }
     }
     assertEquals(0, errors);
     if (skippedKeys > 0) {
-      System.out.println("RSAES-OAEP: file:" + filename + " skipped key:" + skippedKeys);
+      System.out.println("RSAES-OAEP: file:" + filename +
+                         " skipped key:" + skippedKeys);
       assertTrue(allowSkippingKeys);
     } else {
       assertEquals(numTests, cntTests);
@@ -298,93 +309,91 @@ public class RsaOaepTest {
 
   @Test
   public void testRsaOaep2048Sha1Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_2048_sha1_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_2048_sha1_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha224Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_2048_sha224_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_2048_sha224_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha224Mgf1Sha224() throws Exception {
-   testOaep("rsa_oaep_2048_sha224_mgf1sha224_test.json", false);
+    testOaep("rsa_oaep_2048_sha224_mgf1sha224_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha256Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_2048_sha256_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_2048_sha256_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha256Mgf1Sha256() throws Exception {
-   testOaep("rsa_oaep_2048_sha256_mgf1sha256_test.json", false);
+    testOaep("rsa_oaep_2048_sha256_mgf1sha256_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha384Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_2048_sha384_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_2048_sha384_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha384Mgf1Sha384() throws Exception {
-   testOaep("rsa_oaep_2048_sha384_mgf1sha384_test.json", false);
+    testOaep("rsa_oaep_2048_sha384_mgf1sha384_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha512Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_2048_sha512_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_2048_sha512_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep2048Sha512Mgf1Sha512() throws Exception {
-   testOaep("rsa_oaep_2048_sha512_mgf1sha512_test.json", false);
+    testOaep("rsa_oaep_2048_sha512_mgf1sha512_test.json", false);
   }
 
   @Test
   public void testRsaOaep3072Sha256Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_3072_sha256_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_3072_sha256_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep3072Sha256Mgf1Sha256() throws Exception {
-   testOaep("rsa_oaep_3072_sha256_mgf1sha256_test.json", false);
+    testOaep("rsa_oaep_3072_sha256_mgf1sha256_test.json", false);
   }
 
   @Test
   public void testRsaOaep3072Sha512Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_3072_sha512_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_3072_sha512_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep3072Sha512Mgf1Sha512() throws Exception {
-   testOaep("rsa_oaep_3072_sha512_mgf1sha512_test.json", false);
+    testOaep("rsa_oaep_3072_sha512_mgf1sha512_test.json", false);
   }
 
   @Test
   public void testRsaOaep4096Sha256Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_4096_sha256_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_4096_sha256_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep4096Sha256Mgf1Sha256() throws Exception {
-   testOaep("rsa_oaep_4096_sha256_mgf1sha256_test.json", false);
+    testOaep("rsa_oaep_4096_sha256_mgf1sha256_test.json", false);
   }
 
   @Test
   public void testRsaOaep4096Sha512Mgf1Sha1() throws Exception {
-   testOaep("rsa_oaep_4096_sha512_mgf1sha1_test.json", false);
+    testOaep("rsa_oaep_4096_sha512_mgf1sha1_test.json", false);
   }
 
   @Test
   public void testRsaOaep4096Sha512Mgf1Sha512() throws Exception {
-   testOaep("rsa_oaep_4096_sha512_mgf1sha512_test.json", false);
+    testOaep("rsa_oaep_4096_sha512_mgf1sha512_test.json", false);
   }
 
   @Test
   public void testRsaOaepMisc() throws Exception {
-   testOaep("rsa_oaep_misc_test.json", false);
+    testOaep("rsa_oaep_misc_test.json", false);
   }
- 
 }
-

@@ -20,27 +20,28 @@ goog.provide('wycheproof.webcryptoapi');
 goog.require('goog.testing.TestCase');
 goog.require('goog.userAgent.product');
 
-const TEST_TIMEOUT = 120*1000;
+const TEST_TIMEOUT = 120 * 1000;
 
-// A dictionary containing the parameters that are supported by the current browser
+// A dictionary containing the parameters that are supported by the current
+// browser
 var SUPPORTED;
 // Parameters that are supported by Microsoft Edge
 const EDGE_SUPPORTED = {
-    'aesgcm-key-size': [128, 192, 256],
-    'ecdsa-curve': ['P-256', 'P-384', 'P-521'],
-    'hash': ['SHA-256', 'SHA-384', 'SHA-512']
+  'aesgcm-key-size' : [ 128, 192, 256 ],
+  'ecdsa-curve' : [ 'P-256', 'P-384', 'P-521' ],
+  'hash' : [ 'SHA-256', 'SHA-384', 'SHA-512' ]
 };
 // Parameters that are supported by Chrome
 const CHROME_SUPPORTED = {
-    'aesgcm-key-size': [128, 256],
-    'ecdsa-curve': ['P-256', 'P-384', 'P-521'],
-    'hash': ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512']
+  'aesgcm-key-size' : [ 128, 256 ],
+  'ecdsa-curve' : [ 'P-256', 'P-384', 'P-521' ],
+  'hash' : [ 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512' ]
 };
 // Parameters that are supported by Firefox
 const FIREFOX_SUPPORTED = {
-    'aesgcm-key-size': [128, 192, 256],
-    'ecdsa-curve': ['P-256', 'P-384', 'P-521'],
-    'hash': ['SHA-1', 'SHA-256', 'SHA-384', 'SHA-512']
+  'aesgcm-key-size' : [ 128, 192, 256 ],
+  'ecdsa-curve' : [ 'P-256', 'P-384', 'P-521' ],
+  'hash' : [ 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512' ]
 };
 
 // Test names
@@ -115,5 +116,3 @@ wycheproof.webcryptoapi.setupPresubmitTests = function() {
     SUPPORTED = EDGE_SUPPORTED;
   }
 };
-
-

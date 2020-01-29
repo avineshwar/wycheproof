@@ -33,7 +33,7 @@ public class BasicTest {
       // Using a TreeSet here, because the elements are sorted.
       TreeSet<String> list = new TreeSet<String>();
       for (Object key : p.keySet()) {
-        list.add((String) key);
+        list.add((String)key);
       }
       for (String algorithm : list) {
         if (algorithm.startsWith("Alg.Alias.")) {

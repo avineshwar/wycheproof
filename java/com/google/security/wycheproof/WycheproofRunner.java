@@ -26,13 +26,15 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 
 /**
- * A custom JUnit4 runner that, with annotations, allows choosing tests to run on a specific
- * provider. To use it, annotate a runner class with {@code RunWith(WycheproofRunner.class)}, and
- * {@code SuiteClasses({AesGcmTest.class, ...})}. When you run this class, it will run all the tests
- * in all the suite classes.
+ * A custom JUnit4 runner that, with annotations, allows choosing tests to run
+ * on a specific provider. To use it, annotate a runner class with {@code
+ * RunWith(WycheproofRunner.class)}, and
+ * {@code SuiteClasses({AesGcmTest.class, ...})}. When you run this class, it
+ * will run all the tests in all the suite classes.
  *
- * <p>To exclude certain tests, a runner class should be annotated with {@code @Provider} which
- * indicates the target provider. Test exclusion is defined as follows:
+ * <p>To exclude certain tests, a runner class should be annotated with {@code
+ * @Provider} which indicates the target provider. Test exclusion is defined as
+ * follows:
  *
  * <ul>
  *   <li>@Fast test runners skip @SlowTest test functions.
@@ -67,7 +69,8 @@ public class WycheproofRunner extends Suite {
   }
 
   /**
-   * Annotation to specify presubmit test runners that exclude {@code @NoPresubmitTets} tests.
+   * Annotation to specify presubmit test runners that exclude {@code
+   * @NoPresubmitTets} tests.
    *
    * <p>Usage: @Presubmit(ProviderType.BOUNCY_CASTLE)
    */
@@ -76,7 +79,8 @@ public class WycheproofRunner extends Suite {
   public @interface Presubmit {}
 
   /**
-   * Annotation to specify fast test runners that exclude {@code @SlowTest} tests.
+   * Annotation to specify fast test runners that exclude {@code @SlowTest}
+   * tests.
    *
    * <p>Usage: @Fast
    */
@@ -87,8 +91,8 @@ public class WycheproofRunner extends Suite {
   // Annotations for test functions
 
   /**
-   * Tests that take too much time to run, should be excluded from TAP and wildcard target patterns
-   * like:..., :*, or :all.
+   * Tests that take too much time to run, should be excluded from TAP and
+   * wildcard target patterns like:..., :*, or :all.
    *
    * <p>Usage: @SlowTest(providers = {ProviderType.BOUNCY_CASTLE, ...})
    */
@@ -101,13 +105,17 @@ public class WycheproofRunner extends Suite {
   /**
    * Tests that should be excluded from presubmit checks on specific providers.
    *
-   * <p>Usage: @NoPresubmitTest( providers = {ProviderType.BOUNCY_CASTLE, ...}, bugs =
+   * <p>Usage: @NoPresubmitTest( providers = {ProviderType.BOUNCY_CASTLE, ...},
+   * bugs =
    * {"b/123456789"} )
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.METHOD, ElementType.FIELD})
   public @interface NoPresubmitTest {
-    /** List of providers that this test method should not run as presubmit check. */
+    /**
+     * List of providers that this test method should not run as presubmit
+     * check.
+     */
     ProviderType[] providers();
 
     /** List of blocking bugs (and comments). */
@@ -115,9 +123,11 @@ public class WycheproofRunner extends Suite {
   }
 
   /**
-   * Annotation to specify test functions that should be excluded on specific providers.
+   * Annotation to specify test functions that should be excluded on specific
+   * providers.
    *
-   * <p>Usage: @ExcludedTest(providers = {ProviderType.BOUNCY_CASTLE, ProviderType.OPENJDK})
+   * <p>Usage: @ExcludedTest(providers = {ProviderType.BOUNCY_CASTLE,
+   * ProviderType.OPENJDK})
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.METHOD})
@@ -154,21 +164,24 @@ public class WycheproofRunner extends Suite {
 
     private boolean isOkayToRunTest(Description description) {
       if (targetProvider == null) {
-        // Run all test functions if the test runner is not annotated with {@code @Provider}.
+        // Run all test functions if the test runner is not annotated with
+        // {@code @Provider}.
         return true;
       }
       // Skip @ExcludedTest tests
       ExcludedTest excludedTest = description.getAnnotation(ExcludedTest.class);
-      if (excludedTest != null
-          && Arrays.asList(excludedTest.providers()).contains(targetProvider.value())) {
+      if (excludedTest != null && Arrays.asList(excludedTest.providers())
+                                      .contains(targetProvider.value())) {
         return false;
       }
 
-      // If the runner class is annotated with @Presubmit, skip non-presubmit tests
+      // If the runner class is annotated with @Presubmit, skip non-presubmit
+      // tests
       if (presubmit != null) {
-        NoPresubmitTest ignoreOn = description.getAnnotation(NoPresubmitTest.class);
-        if (ignoreOn != null
-            && Arrays.asList(ignoreOn.providers()).contains(targetProvider.value())) {
+        NoPresubmitTest ignoreOn =
+            description.getAnnotation(NoPresubmitTest.class);
+        if (ignoreOn != null && Arrays.asList(ignoreOn.providers())
+                                    .contains(targetProvider.value())) {
           return false;
         }
       }
@@ -176,8 +189,8 @@ public class WycheproofRunner extends Suite {
       // If the runner class is annotated with @Fast, skip slow tests
       if (fast != null) {
         SlowTest ignoreOn = description.getAnnotation(SlowTest.class);
-        if (ignoreOn != null
-            && Arrays.asList(ignoreOn.providers()).contains(targetProvider.value())) {
+        if (ignoreOn != null && Arrays.asList(ignoreOn.providers())
+                                    .contains(targetProvider.value())) {
           return false;
         }
       }
@@ -188,7 +201,8 @@ public class WycheproofRunner extends Suite {
   }
 
   /** Required constructor: called by JUnit reflectively. */
-  public WycheproofRunner(Class<?> runnerClass, RunnerBuilder builder) throws InitializationError {
+  public WycheproofRunner(Class<?> runnerClass, RunnerBuilder builder)
+      throws InitializationError {
     super(runnerClass, builder);
     addFilter(new ExcludeTestFilter(runnerClass));
     TestUtil.printJavaInformation();

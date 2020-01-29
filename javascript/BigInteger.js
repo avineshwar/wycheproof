@@ -29,7 +29,6 @@ goog.require('wycheproof.TestUtil');
 
 var TestUtil = wycheproof.TestUtil;
 
-
 /**
  * Non-negative arbitrary-precision integers.
  * @param {(!Array<Byte>|!Uint8Array)=} optValue
@@ -37,11 +36,9 @@ var TestUtil = wycheproof.TestUtil;
  * @constructor
  * @extends {e2e.BigNum}
  */
-wycheproof.BigInteger = function(optValue) {
-   wycheproof.BigInteger.base(this, 'constructor', optValue);
-};
+wycheproof.BigInteger = function(
+    optValue) { wycheproof.BigInteger.base(this, 'constructor', optValue); };
 goog.inherits(wycheproof.BigInteger, e2e.BigNum);
-
 
 /**
  * A factory method to create a BigInteger from a string that is
@@ -71,13 +68,12 @@ wycheproof.BigInteger.fromHex = function(s) {
 wycheproof.BigInteger.prototype.toBase64Url = function(optValue) {
   var bytes = this.toByteArray();
   if (optValue !== undefined && optValue > bytes.length) {
-    var addingZeros = new Array(optValue-bytes.length).fill(0);
+    var addingZeros = new Array(optValue - bytes.length).fill(0);
     bytes = addingZeros.concat(bytes);
   }
   var b64Str = goog.crypt.base64.encodeByteArray(bytes);
   return TestUtil.base64ToBase64Url(b64Str);
 };
-
 
 /**
  * Converts this to an ArrayBuffer of big-endian bytes
@@ -90,12 +86,11 @@ wycheproof.BigInteger.prototype.toBase64Url = function(optValue) {
 wycheproof.BigInteger.prototype.toArrayBuffer = function(optValue) {
   var bytes = this.toByteArray();
   if (optValue !== undefined && optValue > bytes.length) {
-    var addingZeros = new Array(optValue-bytes.length).fill(0);
+    var addingZeros = new Array(optValue - bytes.length).fill(0);
     bytes = addingZeros.concat(bytes);
   }
   return new Uint8Array(bytes).buffer;
 };
-
 
 /**
  * Odd prime big integer that could be use as the modulus in modular arithmetic
@@ -104,9 +99,6 @@ wycheproof.BigInteger.prototype.toArrayBuffer = function(optValue) {
  * @constructor
  * @extends {e2e.BigPrimeNum}
  */
-wycheproof.BigPrimeInteger = function(modulus) {
-   wycheproof.BigPrimeInteger.base(this, 'constructor', modulus);
-};
+wycheproof.BigPrimeInteger = function(
+    modulus) { wycheproof.BigPrimeInteger.base(this, 'constructor', modulus); };
 goog.inherits(wycheproof.BigPrimeInteger, e2e.BigPrimeNum);
-
-

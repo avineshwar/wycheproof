@@ -31,9 +31,8 @@ var RsaUtil = wycheproof.webcryptoapi.RsaUtil;
 var HashUtil = wycheproof.webcryptoapi.HashUtil;
 var BigInteger = wycheproof.BigInteger;
 // Test vector file
-var RSASSA_PKCS1_SIGNATURE_VECTOR_FILE
-    = '../../testvectors/rsa_signature_test.json';
-
+var RSASSA_PKCS1_SIGNATURE_VECTOR_FILE =
+    '../../testvectors/rsa_signature_test.json';
 
 /**
  * Tests RSASSA-PKCS1-v1_5 signature implementation with a number of vectors.
@@ -41,8 +40,8 @@ var RSASSA_PKCS1_SIGNATURE_VECTOR_FILE
  * @return {!Promise}
  */
 function testRsaSsaPkcs1Vectors() {
-  var tv = TestUtil.readJsonTestVectorsFromFile(
-      RSASSA_PKCS1_SIGNATURE_VECTOR_FILE);
+  var tv =
+      TestUtil.readJsonTestVectorsFromFile(RSASSA_PKCS1_SIGNATURE_VECTOR_FILE);
   var testCase = new goog.testing.TestCase();
 
   for (var i = 0; i < tv['testGroups'].length; i++) {
@@ -61,12 +60,11 @@ function testRsaSsaPkcs1Vectors() {
       var tcId = tc['tcId'];
 
       // Creates new Test Case object
-      var test = new RsaUtil.RsaSignatureTestCase(tcId, e, n, hashAlg,
-          RsaUtil.RSASSA_PKCS1, msg, sig, result);
+      var test = new RsaUtil.RsaSignatureTestCase(
+          tcId, e, n, hashAlg, RsaUtil.RSASSA_PKCS1, msg, sig, result);
       testCase.addNewTest('Test case ' + tcId, RsaUtil.testVerification, test);
     }
   }
 
   return testCase.runTestsReturningPromise().then(TestUtil.checkTestCaseResult);
 }
-

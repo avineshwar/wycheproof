@@ -31,12 +31,14 @@ import org.junit.runners.JUnit4;
 public class BigIntegerTest {
 
   /** Convenience method to get a BigInteger from a JsonObject */
-  protected static BigInteger getBigInteger(JsonObject object, String name) throws Exception {
+  protected static BigInteger getBigInteger(JsonObject object, String name)
+      throws Exception {
     return JsonUtil.asBigInteger(object.get(name));
   }
 
   /** Convenience method to get a byte array from a JsonObject */
-  protected static byte[] getBytes(JsonObject object, String name) throws Exception {
+  protected static byte[] getBytes(JsonObject object, String name)
+      throws Exception {
     return JsonUtil.asByteArray(object.get(name));
   }
 
@@ -51,16 +53,18 @@ public class BigIntegerTest {
       for (JsonElement t : group.getAsJsonArray("tests")) {
         JsonObject testcase = t.getAsJsonObject();
         int tcid = testcase.get("tcId").getAsInt();
-        String tc = "tcId: " + tcid + " " + testcase.get("comment").getAsString();
+        String tc =
+            "tcId: " + tcid + " " + testcase.get("comment").getAsString();
         BigInteger value = getBigInteger(testcase, "value");
         // result is "valid" if the tested integer is prime, "invalid" if it is
         // composite or -1, 0, 1 and it is "acceptable" if it is the negative of
         // prime. BigInteger.isProbablyPrime() accepts the later as prime (as do
         // a number of other primality tests). Such a behaviour may be a pitfall
-        // for cryptographic protocols. However, it can not be flagged as error. 
+        // for cryptographic protocols. However, it can not be flagged as error.
         String result = testcase.get("result").getAsString();
 
-        // The probability that a non-prime passes should be at most 1-2^{-certainty}.
+        // The probability that a non-prime passes should be at most
+        // 1-2^{-certainty}.
         int certainty = 80;
         boolean isProbablePrime = value.isProbablePrime(certainty);
         if (result.equals("invalid") && isProbablePrime) {

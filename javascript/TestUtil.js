@@ -28,12 +28,12 @@ goog.require('goog.json');
  *
  * @return {!JSONObject}
  */
-wycheproof.TestUtil.readJsonTestVectorsFromFile = function(filename){
+wycheproof.TestUtil.readJsonTestVectorsFromFile = function(filename) {
   var fileContent = goog.loadFileSync_(filename);
-  assertTrue('Invalid file format (expected JSON)', goog.json.isValid(fileContent));
+  assertTrue('Invalid file format (expected JSON)',
+             goog.json.isValid(fileContent));
   return JSON.parse(fileContent);
 };
-
 
 /**
  * Analyzes the result from a goog.testing.TestCase execution.
@@ -50,16 +50,14 @@ wycheproof.TestUtil.checkTestCaseResult = function(result) {
   }
 };
 
-
 /**
  * Checks whether the given string is in hex format.
  * @param {!string} s
  *
  * @return {!boolean}
  */
-wycheproof.TestUtil.isHex = function(s) {
-  return /(^[0-9A-F]*$)|(^[0-9a-f]*$)/.test(s);
-};
+wycheproof.TestUtil.isHex = function(
+    s) { return /(^[0-9A-F]*$)|(^[0-9a-f]*$)/.test(s); };
 
 /**
  * Converts a hex string to a ArrayBuffer.
@@ -78,9 +76,8 @@ wycheproof.TestUtil.hexToArrayBuffer = function(s) {
  *
  * @return {!string}
  */
-wycheproof.TestUtil.arrayBufferToHex = function(ab) {
-  return goog.crypt.byteArrayToHex(new Uint8Array(ab));
-};
+wycheproof.TestUtil.arrayBufferToHex = function(
+    ab) { return goog.crypt.byteArrayToHex(new Uint8Array(ab)); };
 
 /**
  * Converts a Base64URL string to hex format
@@ -88,7 +85,7 @@ wycheproof.TestUtil.arrayBufferToHex = function(ab) {
  *
  * @return {!string}
  */
-wycheproof.TestUtil.base64UrlToHex = function (s) {
+wycheproof.TestUtil.base64UrlToHex = function(s) {
   var b64str = wycheproof.TestUtil.base64UrlToBase64(s);
   return wycheproof.TestUtil.base64ToHex(b64str);
 };
@@ -121,11 +118,8 @@ wycheproof.TestUtil.base64ToHex = function(s) {
  *
  * @return {!string}
  */
-wycheproof.TestUtil.base64ToBase64Url = function(s) {
-  return s.replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-};
+wycheproof.TestUtil.base64ToBase64Url = function(
+    s) { return s.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''); };
 
 /**
  * Converts a Base64Url string to Base64

@@ -21,8 +21,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 
 /** Utilities for reading test vectors in JSON format */
@@ -36,8 +36,7 @@ public class JsonUtil {
    * @throws IOException if the test vectors could not be read.
    * @throws JsonParseException if the file is not valid JSON.
    */
-  public static JsonObject getTestVectors(String filename) throws 
-      IOException {
+  public static JsonObject getTestVectors(String filename) throws IOException {
     // The directory where the test vectors are.
     String testVectorsDir = "testvectors/";
     FileInputStream is = new FileInputStream(testVectorsDir + filename);
@@ -47,9 +46,9 @@ public class JsonUtil {
     return elem.getAsJsonObject();
   }
 
-  /** 
+  /**
    * Converts a JsonElement into a byte array.
-   * @param element a JsonElement containing an encoded byte array. 
+   * @param element a JsonElement containing an encoded byte array.
    *        Wycheproof represents byte arrays as hexadeciamal strings.
    * @throws ClassCastException if element is not a valid string value.
    * @throws IllegalStateException - if element contains an array.
@@ -61,15 +60,16 @@ public class JsonUtil {
 
   /**
    * Converts a JsonElement into a BigInteger.
-   * @param element a JsonElement containing a BigInteger. 
+   * @param element a JsonElement containing a BigInteger.
    * Wycheproof represents BigIntegers as hexadecimal strings using
    * twos complement representation.
    * <p> E.g., 31 is represented as "1f", -1 is represented as "f", and
    * 255 is represented as "0ff".
    * @throws ClassCastException if element is not a valid string value.
    * @throws IllegalStateException if element contains an array.
-   * @throws NumberFormatException if representation of the BigInteger is invalid.
-   */ 
+   * @throws NumberFormatException if representation of the BigInteger is
+   *     invalid.
+   */
   public static BigInteger asBigInteger(JsonElement element) {
     String hex = element.getAsString();
     // TODO(bleichen): Consider to change the representation of BigIntegers in

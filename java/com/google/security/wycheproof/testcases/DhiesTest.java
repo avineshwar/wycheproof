@@ -58,27 +58,27 @@ public class DhiesTest {
   //   We could move this into some TestUtil.
   public DHParameterSpec ike2048() {
     final BigInteger p =
-        new BigInteger(
-            "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1"
-                + "29024E088A67CC74020BBEA63B139B22514A08798E3404DD"
-                + "EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245"
-                + "E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED"
-                + "EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3D"
-                + "C2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F"
-                + "83655D23DCA3AD961C62F356208552BB9ED529077096966D"
-                + "670C354E4ABC9804F1746C08CA18217C32905E462E36CE3B"
-                + "E39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9"
-                + "DE2BCBF6955817183995497CEA956AE515D2261898FA0510"
-                + "15728E5A8AACAA68FFFFFFFFFFFFFFFF",
-            16);
+        new BigInteger("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1"
+                           + "29024E088A67CC74020BBEA63B139B22514A08798E3404DD"
+                           + "EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245"
+                           + "E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7ED"
+                           + "EE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3D"
+                           + "C2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F"
+                           + "83655D23DCA3AD961C62F356208552BB9ED529077096966D"
+                           + "670C354E4ABC9804F1746C08CA18217C32905E462E36CE3B"
+                           + "E39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9"
+                           + "DE2BCBF6955817183995497CEA956AE515D2261898FA0510"
+                           + "15728E5A8AACAA68FFFFFFFFFFFFFFFF",
+                       16);
     final BigInteger g = new BigInteger("2");
     return new DHParameterSpec(p, g);
   }
 
   /**
-   * WARNING: This test uses weak crypto (i.e. DHIESWithAES), if supported. Checks that key
-   * agreement using DHIES works in the sense that it can decrypt what it encrypts. Unfortunately it
-   * seems that there is no secure mode using AES.
+   * WARNING: This test uses weak crypto (i.e. DHIESWithAES), if supported.
+   * Checks that key agreement using DHIES works in the sense that it can
+   * decrypt what it encrypts. Unfortunately it seems that there is no secure
+   * mode using AES.
    */
   @SuppressWarnings("InsecureCryptoUsage")
   @Test
@@ -106,13 +106,16 @@ public class DhiesTest {
   }
 
   /**
-   * WARNING: This test uses weak crypto (i.e. DHIESWithAES). DHIES should be secure against chosen
-   * ciphertexts. Checks that a modification of the ciphertext is dectected.
+   * WARNING: This test uses weak crypto (i.e. DHIESWithAES). DHIES should be
+   * secure against chosen ciphertexts. Checks that a modification of the
+   * ciphertext is dectected.
    */
-  @SlowTest(providers = {ProviderType.BOUNCY_CASTLE, ProviderType.SPONGY_CASTLE})
+  @SlowTest(providers = {ProviderType.BOUNCY_CASTLE,
+                         ProviderType.SPONGY_CASTLE})
   @SuppressWarnings("InsecureCryptoUsage")
   @Test
-  public void testDhiesCorrupt() throws Exception {
+  public void
+  testDhiesCorrupt() throws Exception {
     KeyPairGenerator kf = KeyPairGenerator.getInstance("DH");
     kf.initialize(ike2048());
     KeyPair keyPair = kf.generateKeyPair();
@@ -130,7 +133,7 @@ public class DhiesTest {
     byte[] ciphertext = dhies.doFinal(message);
     for (int i = 0; i < ciphertext.length; i++) {
       byte[] corrupt = Arrays.copyOf(ciphertext, ciphertext.length);
-      corrupt[i] ^= (byte) 1;
+      corrupt[i] ^= (byte)1;
       try {
         dhies.init(Cipher.DECRYPT_MODE, priv);
         dhies.doFinal(corrupt);
@@ -142,8 +145,8 @@ public class DhiesTest {
   }
 
   /**
-   * Tries to detect if an algorithm is using ECB. Unfortunately, many JCE algorithms use ECB if no
-   * encryption mode is specified.
+   * Tries to detect if an algorithm is using ECB. Unfortunately, many JCE
+   * algorithms use ECB if no encryption mode is specified.
    */
   @SuppressWarnings("InsecureCryptoUsage")
   public void testNotEcb(String algorithm) throws Exception {
@@ -165,11 +168,13 @@ public class DhiesTest {
     dhies.init(Cipher.ENCRYPT_MODE, pub);
     byte[] ciphertext = dhies.doFinal(message);
     for (int i = 0; i + 32 <= ciphertext.length; i++) {
-      String block1 = TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, i, i + 16));
-      String block2 = TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, i + 16, i + 32));
-      assertTrue(
-          "Ciphertext repeats at " + i + ":" + TestUtil.bytesToHex(ciphertext),
-          !block1.equals(block2));
+      String block1 =
+          TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, i, i + 16));
+      String block2 =
+          TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, i + 16, i + 32));
+      assertTrue("Ciphertext repeats at " + i + ":" +
+                     TestUtil.bytesToHex(ciphertext),
+                 !block1.equals(block2));
     }
   }
 
@@ -184,24 +189,25 @@ public class DhiesTest {
    * <p>Problems found:
    *
    * <ul>
-   *   <li>CVE-2016-1000344 BouncyCaslte before v.1.56 used ECB mode as a default.
+   *   <li>CVE-2016-1000344 BouncyCaslte before v.1.56 used ECB mode as a
+   * default.
    * </ul>
    */
   @NoPresubmitTest(
-    providers = {ProviderType.BOUNCY_CASTLE},
-    bugs = {"b/31101111: won't fix, all BC DHIES modes are banned"}
-  )
+      providers = {ProviderType.BOUNCY_CASTLE},
+      bugs = {"b/31101111: won't fix, all BC DHIES modes are banned"})
   @Test
-  public void testSemanticSecurityDhiesWithAes() throws Exception {
+  public void
+  testSemanticSecurityDhiesWithAes() throws Exception {
     testNotEcb("DHIESWithAES");
   }
 
   @NoPresubmitTest(
-    providers = {ProviderType.BOUNCY_CASTLE},
-    bugs = {"b/31101111: won't fix, all BC DHIES modes are banned"}
-  )
+      providers = {ProviderType.BOUNCY_CASTLE},
+      bugs = {"b/31101111: won't fix, all BC DHIES modes are banned"})
   @Test
-  public void testSemanticSecurityDhiesWithDesede() throws Exception {
+  public void
+  testSemanticSecurityDhiesWithDesede() throws Exception {
     testNotEcb("DHIESWITHDESEDE");
   }
 }

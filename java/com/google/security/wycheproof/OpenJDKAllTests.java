@@ -19,33 +19,36 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-/** Tests for OpenJDK's providers: SunJCE, SunEC, etc. OpenJDKAllTests runs all tests. */
+/**
+ * Tests for OpenJDK's providers: SunJCE, SunEC, etc. OpenJDKAllTests runs all
+ * tests.
+ */
 @RunWith(WycheproofRunner.class)
 @SuiteClasses({
-  AesGcmTest.class,
-  BasicTest.class,
-  CipherInputStreamTest.class,
-  CipherOutputStreamTest.class,
-  DhTest.class,
-  DsaTest.class,
-  EcKeyTest.class,
-  EcdhTest.class,
-  EcdsaTest.class,
-  JsonAeadTest.class,
-  JsonCipherTest.class,
-  JsonEcdhTest.class,
-  JsonKeyWrapTest.class,
-  JsonMacTest.class,
-  JsonSignatureTest.class,
-  JsonXdhTest.class,
-  MacTest.class,
-  MessageDigestTest.class,
-  RsaEncryptionTest.class,
-  RsaKeyTest.class,
-  RsaPssTest.class,
-  RsaOaepTest.class,
-  RsaSignatureTest.class,
-  SecureRandomTest.class,
+    AesGcmTest.class,
+    BasicTest.class,
+    CipherInputStreamTest.class,
+    CipherOutputStreamTest.class,
+    DhTest.class,
+    DsaTest.class,
+    EcKeyTest.class,
+    EcdhTest.class,
+    EcdsaTest.class,
+    JsonAeadTest.class,
+    JsonCipherTest.class,
+    JsonEcdhTest.class,
+    JsonKeyWrapTest.class,
+    JsonMacTest.class,
+    JsonSignatureTest.class,
+    JsonXdhTest.class,
+    MacTest.class,
+    MessageDigestTest.class,
+    RsaEncryptionTest.class,
+    RsaKeyTest.class,
+    RsaPssTest.class,
+    RsaOaepTest.class,
+    RsaSignatureTest.class,
+    SecureRandomTest.class,
 })
 @Provider(ProviderType.OPENJDK)
 public final class OpenJDKAllTests {

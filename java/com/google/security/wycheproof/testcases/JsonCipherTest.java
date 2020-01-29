@@ -32,15 +32,16 @@ import org.junit.runners.JUnit4;
 /**
  * This test uses test vectors in JSON format to test symmetric ciphers.
  *
- * <p>Ciphers tested in this class are unauthenticated ciphers (i.e. don't have additional data) and
- * are randomized using an initialization vector as long as the JSON test vectors are represented
- * with the type "IndCpaTest".
+ * <p>Ciphers tested in this class are unauthenticated ciphers (i.e. don't have
+ * additional data) and are randomized using an initialization vector as long as
+ * the JSON test vectors are represented with the type "IndCpaTest".
  */
 @RunWith(JUnit4.class)
 public class JsonCipherTest {
 
   /** Convenience method to get a byte array from a JsonObject. */
-  protected static byte[] getBytes(JsonObject object, String name) throws Exception {
+  protected static byte[] getBytes(JsonObject object, String name)
+      throws Exception {
     return JsonUtil.asByteArray(object.get(name));
   }
 
@@ -50,7 +51,7 @@ public class JsonCipherTest {
     }
     byte res = 0;
     for (int i = 0; i < a.length; i++) {
-      res |= (byte) (a[i] ^ b[i]);
+      res |= (byte)(a[i] ^ b[i]);
     }
     return res == 0;
   }
@@ -64,8 +65,8 @@ public class JsonCipherTest {
    * @param key raw key bytes
    * @param iv the initialisation vector
    */
-  protected static void initCipher(
-      Cipher cipher, String algorithm, int opmode, byte[] key, byte[] iv) throws Exception {
+  protected static void initCipher(Cipher cipher, String algorithm, int opmode,
+                                   byte[] key, byte[] iv) throws Exception {
     SecretKeySpec keySpec = null;
     if (algorithm.startsWith("AES/")) {
       keySpec = new SecretKeySpec(key, "AES");
@@ -76,8 +77,8 @@ public class JsonCipherTest {
     cipher.init(opmode, keySpec, ivSpec);
   }
 
-
-  /** Example format for test vectors
+  /**
+   *Example format for test vectors
    * {
    *   "algorithm" : "AES-CBC-PKCS5",
    *   "generatorVersion" : "0.2.1",
@@ -101,26 +102,24 @@ public class JsonCipherTest {
    *         },
    *         ...
    **/
-  // This is a false positive, since errorprone cannot track values passed into a method.
+  // This is a false positive, since errorprone cannot track values passed into
+  // a method.
   @SuppressWarnings("InsecureCryptoUsage")
   public void testCipher(String filename, String algorithm) throws Exception {
     // Testing with old test vectors may a reason for a test failure.
     // Version number have the format major.minor[status].
-    // Versions before 1.0 are experimental and  use formats that are expected to change.
-    // Versions after 1.0 change the major number if the format changes and change
-    // the minor number if only the test vectors (but not the format) changes.
-    // Versions meant for distribution have no status.
+    // Versions before 1.0 are experimental and  use formats that are expected
+    // to change. Versions after 1.0 change the major number if the format
+    // changes and change the minor number if only the test vectors (but not the
+    // format) changes. Versions meant for distribution have no status.
     final String expectedVersion = "0.4";
     JsonObject test = JsonUtil.getTestVectors(filename);
     Set<String> exceptions = new TreeSet<String>();
     String generatorVersion = test.get("generatorVersion").getAsString();
     if (!generatorVersion.equals(expectedVersion)) {
-      System.out.println(
-          algorithm
-              + ": expecting test vectors with version "
-              + expectedVersion
-              + " found vectors with version "
-              + generatorVersion);
+      System.out.println(algorithm + ": expecting test vectors with version " +
+                         expectedVersion + " found vectors with version " +
+                         generatorVersion);
     }
     int numTests = test.get("numberOfTests").getAsInt();
     int cntTests = 0;
@@ -129,7 +128,8 @@ public class JsonCipherTest {
     try {
       cipher = Cipher.getInstance(algorithm);
     } catch (NoSuchAlgorithmException ex) {
-      System.out.println("Algorithm is not supported. Skipping test for " + algorithm);
+      System.out.println("Algorithm is not supported. Skipping test for " +
+                         algorithm);
       return;
     }
     for (JsonElement g : test.getAsJsonArray("testGroups")) {
@@ -138,15 +138,17 @@ public class JsonCipherTest {
         cntTests++;
         JsonObject testcase = t.getAsJsonObject();
         int tcid = testcase.get("tcId").getAsInt();
-        String tc = "tcId: " + tcid + " " + testcase.get("comment").getAsString();
+        String tc =
+            "tcId: " + tcid + " " + testcase.get("comment").getAsString();
         byte[] key = getBytes(testcase, "key");
         byte[] iv = getBytes(testcase, "iv");
         byte[] msg = getBytes(testcase, "msg");
         byte[] ciphertext = getBytes(testcase, "ct");
         // Result is one of "valid", "invalid", "acceptable".
         // "valid" are test vectors with matching plaintext, ciphertext and tag.
-        // "invalid" are test vectors with invalid parameters or invalid ciphertext and tag.
-        // "acceptable" are test vectors with weak parameters or legacy formats.
+        // "invalid" are test vectors with invalid parameters or invalid
+        // ciphertext and tag. "acceptable" are test vectors with weak
+        // parameters or legacy formats.
         String result = testcase.get("result").getAsString();
 
         // Test encryption
@@ -163,17 +165,16 @@ public class JsonCipherTest {
           boolean eq = arrayEquals(ciphertext, encrypted);
           if (result.equals("invalid")) {
             if (eq) {
-              // Some test vectors use invalid parameters that should be rejected.
+              // Some test vectors use invalid parameters that should be
+              // rejected.
               System.out.println("Encrypted " + tc);
               errors++;
             }
           } else {
             if (!eq) {
               System.out.println(
-                  "Incorrect ciphertext for "
-                      + tc
-                      + " ciphertext:"
-                      + TestUtil.bytesToHex(encrypted));
+                  "Incorrect ciphertext for " + tc +
+                  " ciphertext:" + TestUtil.bytesToHex(encrypted));
               errors++;
             }
           }
@@ -185,14 +186,16 @@ public class JsonCipherTest {
         }
 
         // Test decryption
-        // The algorithms tested in this class are typically malleable. Hence, it is in possible
-        // that modifying ciphertext randomly results in some other valid ciphertext.
-        // However, all the test vectors in Wycheproof are constructed such that they have
-        // invalid padding. If this changes then the test below is too strict.
+        // The algorithms tested in this class are typically malleable. Hence,
+        // it is in possible that modifying ciphertext randomly results in some
+        // other valid ciphertext. However, all the test vectors in Wycheproof
+        // are constructed such that they have invalid padding. If this changes
+        // then the test below is too strict.
         try {
           initCipher(cipher, algorithm, Cipher.DECRYPT_MODE, key, iv);
         } catch (GeneralSecurityException ex) {
-          System.out.println("Parameters accepted for encryption but not decryption " + tc);
+          System.out.println(
+              "Parameters accepted for encryption but not decryption " + tc);
           errors++;
           continue;
         }
@@ -200,12 +203,13 @@ public class JsonCipherTest {
           byte[] decrypted = cipher.doFinal(ciphertext);
           boolean eq = arrayEquals(decrypted, msg);
           if (result.equals("invalid")) {
-            System.out.println("Decrypted invalid ciphertext " + tc + " eq:" + eq);
+            System.out.println("Decrypted invalid ciphertext " + tc +
+                               " eq:" + eq);
             errors++;
           } else {
             if (!eq) {
-              System.out.println(
-                  "Incorrect decryption " + tc + " decrypted:" + TestUtil.bytesToHex(decrypted));
+              System.out.println("Incorrect decryption " + tc + " decrypted:" +
+                                 TestUtil.bytesToHex(decrypted));
             }
           }
         } catch (GeneralSecurityException ex) {
@@ -219,15 +223,16 @@ public class JsonCipherTest {
     }
     assertEquals(0, errors);
     assertEquals(numTests, cntTests);
-    // Generally it is preferable if trying to decrypt ciphertexts with incorrect paddings
-    // does not leak information about invalid paddings through exceptions.
-    // Such information could simplify padding attacks. Ideally, providers should not include
-    // any distinguishing features in the exception. Hence, we expect just one exception here.
+    // Generally it is preferable if trying to decrypt ciphertexts with
+    // incorrect paddings does not leak information about invalid paddings
+    // through exceptions. Such information could simplify padding attacks.
+    // Ideally, providers should not include any distinguishing features in the
+    // exception. Hence, we expect just one exception here.
     //
-    // Seeing distinguishable exception, doesn't necessarily mean that protocols using
-    // AES/CBC/PKCS5Padding with the tested provider are vulnerable to attacks. Rather it means
-    // that the provider might simplify attacks if the protocol is using AES/CBC/PKCS5Padding
-    // incorrectly.
+    // Seeing distinguishable exception, doesn't necessarily mean that protocols
+    // using AES/CBC/PKCS5Padding with the tested provider are vulnerable to
+    // attacks. Rather it means that the provider might simplify attacks if the
+    // protocol is using AES/CBC/PKCS5Padding incorrectly.
     System.out.println("Number of distinct exceptions:" + exceptions.size());
     for (String ex : exceptions) {
       System.out.println(ex);

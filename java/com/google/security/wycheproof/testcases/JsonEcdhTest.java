@@ -31,22 +31,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** This test uses test vectors in JSON format to check implementations of ECDH. */
+/**
+ * This test uses test vectors in JSON format to check implementations of ECDH.
+ */
 @RunWith(JUnit4.class)
 public class JsonEcdhTest {
 
   /** Convenience mehtod to get a String from a JsonObject */
-  protected static String getString(JsonObject object, String name) throws Exception {
+  protected static String getString(JsonObject object, String name)
+      throws Exception {
     return object.get(name).getAsString();
   }
 
   /** Convenience method to get a BigInteger from a JsonObject */
-  protected static BigInteger getBigInteger(JsonObject object, String name) throws Exception {
+  protected static BigInteger getBigInteger(JsonObject object, String name)
+      throws Exception {
     return JsonUtil.asBigInteger(object.get(name));
   }
 
   /** Convenience method to get a byte array from a JsonObject */
-  protected static byte[] getBytes(JsonObject object, String name) throws Exception {
+  protected static byte[] getBytes(JsonObject object, String name)
+      throws Exception {
     return JsonUtil.asByteArray(object.get(name));
   }
 
@@ -67,27 +72,28 @@ public class JsonEcdhTest {
    *        {
    *         "comment" : "normal case",
    *         "curve" : "secp224r1",
-   *         "private" : "565577a49415ca761a0322ad54e4ad0ae7625174baf372c2816f5328",
-   *         "public" : "30...",
-   *         "result" : "valid",
-   *         "shared" : "b8ecdb552d39228ee332bafe4886dbff272f7109edf933bc7542bd4f",
-   *         "tcId" : 1
+   *         "private" :
+   *"565577a49415ca761a0322ad54e4ad0ae7625174baf372c2816f5328", "public" :
+   *"30...", "result" : "valid", "shared" :
+   *"b8ecdb552d39228ee332bafe4886dbff272f7109edf933bc7542bd4f", "tcId" : 1
    *        },
    *     ...
    **/
   public void testEcdhComp(String filename) throws Exception {
     JsonObject test = JsonUtil.getTestVectors(filename);
 
-    // This test expects test vectors as defined in wycheproof/schemas/ecdh_test_schema.json.
-    // In particular, this means that the public keys use X509 encoding.
-    // Test vectors with different encodings of the keys have a different schema.
+    // This test expects test vectors as defined in
+    // wycheproof/schemas/ecdh_test_schema.json. In particular, this means that
+    // the public keys use X509 encoding. Test vectors with different encodings
+    // of the keys have a different schema.
     final String expectedSchema = "ecdh_test_schema.json";
     String schema = test.get("schema").getAsString();
-    assertEquals("Unexpected schema in file:" + filename, expectedSchema, schema);
+    assertEquals("Unexpected schema in file:" + filename, expectedSchema,
+                 schema);
 
     int numTests = test.get("numberOfTests").getAsInt();
     int passedTests = 0;
-    int rejectedTests = 0;  // invalid test vectors leading to exceptions
+    int rejectedTests = 0; // invalid test vectors leading to exceptions
     int skippedTests = 0;  // valid test vectors leading to exceptions
     int errors = 0;
     for (JsonElement g : test.getAsJsonArray("testGroups")) {
@@ -103,51 +109,44 @@ public class JsonEcdhTest {
         String expectedHex = getString(testcase, "shared");
         KeyFactory kf = KeyFactory.getInstance("EC");
         try {
-          ECPrivateKeySpec spec = new ECPrivateKeySpec(priv, EcUtil.getCurveSpecRef(curve));
+          ECPrivateKeySpec spec =
+              new ECPrivateKeySpec(priv, EcUtil.getCurveSpecRef(curve));
           PrivateKey privKey = kf.generatePrivate(spec);
-          X509EncodedKeySpec x509keySpec = new X509EncodedKeySpec(publicEncoded);
+          X509EncodedKeySpec x509keySpec =
+              new X509EncodedKeySpec(publicEncoded);
           PublicKey pubKey = kf.generatePublic(x509keySpec);
           KeyAgreement ka = KeyAgreement.getInstance("ECDH");
           ka.init(privKey);
           ka.doPhase(pubKey, true);
           String sharedHex = TestUtil.bytesToHex(ka.generateSecret());
           if (result.equals("invalid")) {
-            System.out.println(
-                "Computed ECDH with invalid parameters"
-                    + " tcId:"
-                    + tcid
-                    + " comment:"
-                    + comment
-                    + " shared:"
-                    + sharedHex);
+            System.out.println("Computed ECDH with invalid parameters"
+                               + " tcId:" + tcid + " comment:" + comment +
+                               " shared:" + sharedHex);
             errors++;
           } else if (!expectedHex.equals(sharedHex)) {
-            System.out.println(
-                "Incorrect ECDH computation"
-                    + " tcId:"
-                    + tcid
-                    + " comment:"
-                    + comment
-                    + "\nshared:"
-                    + sharedHex
-                    + "\nexpected:"
-                    + expectedHex);
+            System.out.println("Incorrect ECDH computation"
+                               + " tcId:" + tcid + " comment:" + comment +
+                               "\nshared:" + sharedHex +
+                               "\nexpected:" + expectedHex);
             errors++;
           } else {
             passedTests++;
           }
-        } catch (InvalidKeySpecException | InvalidKeyException | NoSuchAlgorithmException ex) {
-          // These are the exception that we expect to see when a curve is not implemented
-          // or when a key is not valid.
+        } catch (InvalidKeySpecException | InvalidKeyException |
+                 NoSuchAlgorithmException ex) {
+          // These are the exception that we expect to see when a curve is not
+          // implemented or when a key is not valid.
           if (result.equals("valid")) {
             skippedTests++;
           } else {
             rejectedTests++;
           }
         } catch (Exception ex) {
-          // Other exceptions typically indicate that something is wrong with the implementation.
-          System.out.println(
-              "Test vector with tcId:" + tcid + " comment:" + comment + " throws:" + ex.toString());
+          // Other exceptions typically indicate that something is wrong with
+          // the implementation.
+          System.out.println("Test vector with tcId:" + tcid + " comment:" +
+                             comment + " throws:" + ex.toString());
           errors++;
         }
       }
@@ -205,5 +204,4 @@ public class JsonEcdhTest {
   public void testBrainpoolP512r1() throws Exception {
     testEcdhComp("ecdh_brainpoolP512r1_test.json");
   }
-
 }

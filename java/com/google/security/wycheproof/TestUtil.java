@@ -39,8 +39,8 @@ public class TestUtil {
   }
 
   /**
-   * Returns a hexadecimal representation of the bytes written to ByteBuffer (i.e. all the bytes
-   * before position()).
+   * Returns a hexadecimal representation of the bytes written to ByteBuffer
+   * (i.e. all the bytes before position()).
    */
   public static String byteBufferToHex(ByteBuffer buffer) {
     ByteBuffer tmp = buffer.duplicate();
@@ -62,7 +62,7 @@ public class TestUtil {
       if ((hi == -1) || (lo == -1)) {
         throw new IllegalArgumentException("input is not hexadecimal");
       }
-      result[i] = (byte) (16 * hi + lo);
+      result[i] = (byte)(16 * hi + lo);
     }
     return result;
   }
@@ -89,14 +89,18 @@ public class TestUtil {
     installOpenJDKProvider("sun.security.smartcardio.SunPCSC");
   }
 
-  private static void installOpenJDKProvider(String className) throws Exception {
-    Provider provider = (Provider) Class.forName(className).getConstructor().newInstance();
+  private static void installOpenJDKProvider(String className)
+      throws Exception {
+    Provider provider =
+        (Provider)Class.forName(className).getConstructor().newInstance();
     Security.insertProviderAt(provider, 1);
   }
 
   public static void printJavaInformation() {
     System.out.println("Running with: ");
-    System.out.println("  java.runtime.name: " + System.getProperty("java.runtime.name"));
-    System.out.println("  java.runtime.version: " + System.getProperty("java.runtime.version"));
+    System.out.println("  java.runtime.name: " +
+                       System.getProperty("java.runtime.name"));
+    System.out.println("  java.runtime.version: " +
+                       System.getProperty("java.runtime.version"));
   }
 }

@@ -20,35 +20,38 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 
-/** SpongyCastleTest excludes {@code @SlowTest} tests. SpongyCastleAllTests runs all tests. */
+/**
+ * SpongyCastleTest excludes {@code @SlowTest} tests. SpongyCastleAllTests runs
+ * all tests.
+ */
 @RunWith(WycheproofRunner.class)
 @SuiteClasses({
-  AesEaxTest.class,
-  AesGcmTest.class,
-  BasicTest.class,
-  CipherInputStreamTest.class,
-  CipherOutputStreamTest.class,
-  DhTest.class,
-  DhiesTest.class,
-  DsaTest.class,
-  EcKeyTest.class,
-  EcdhTest.class,
-  EcdsaTest.class,
-  EciesTest.class,
-  JsonAeadTest.class,
-  JsonCipherTest.class,
-  JsonEcdhTest.class,
-  JsonKeyWrapTest.class,
-  JsonMacTest.class,
-  JsonSignatureTest.class,
-  MacTest.class,
-  MessageDigestTest.class,
-  RsaEncryptionTest.class,
-  RsaKeyTest.class,
-  RsaOaepTest.class,
-  RsaPssTest.class,
-  RsaSignatureTest.class,
-  SecureRandomTest.class,
+    AesEaxTest.class,
+    AesGcmTest.class,
+    BasicTest.class,
+    CipherInputStreamTest.class,
+    CipherOutputStreamTest.class,
+    DhTest.class,
+    DhiesTest.class,
+    DsaTest.class,
+    EcKeyTest.class,
+    EcdhTest.class,
+    EcdsaTest.class,
+    EciesTest.class,
+    JsonAeadTest.class,
+    JsonCipherTest.class,
+    JsonEcdhTest.class,
+    JsonKeyWrapTest.class,
+    JsonMacTest.class,
+    JsonSignatureTest.class,
+    MacTest.class,
+    MessageDigestTest.class,
+    RsaEncryptionTest.class,
+    RsaKeyTest.class,
+    RsaOaepTest.class,
+    RsaPssTest.class,
+    RsaSignatureTest.class,
+    SecureRandomTest.class,
 })
 @Provider(ProviderType.SPONGY_CASTLE)
 public final class SpongyCastleAllTests {

@@ -34,7 +34,6 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class JsonAeadTest {
 
-
   /** Joins two bytearrays. */
   protected static byte[] join(byte[] head, byte[] tail) {
     byte[] res = new byte[head.length + tail.length];
@@ -44,7 +43,8 @@ public class JsonAeadTest {
   }
 
   /** Convenience method to get a byte array from an JsonObject */
-  protected static byte[] getBytes(JsonObject obj, String name) throws Exception {
+  protected static byte[] getBytes(JsonObject obj, String name)
+      throws Exception {
     return JsonUtil.asByteArray(obj.get(name));
   }
 
@@ -54,7 +54,7 @@ public class JsonAeadTest {
     }
     byte res = 0;
     for (int i = 0; i < a.length; i++) {
-      res |= (byte) (a[i] ^ b[i]);
+      res |= (byte)(a[i] ^ b[i]);
     }
     return res == 0;
   }
@@ -62,33 +62,34 @@ public class JsonAeadTest {
   /**
    * Returns an initialized instance of Cipher. Typically it is somewhat
    * time consuming to generate a new instance of Cipher for each encryption.
-   * However, some implementations of ciphers (e.g. AES-GCM in jdk) check that 
+   * However, some implementations of ciphers (e.g. AES-GCM in jdk) check that
    * the same key and nonce are not reused twice in a row to catch simple
-   * programming errors. This precaution can interfere with the tests, since 
+   * programming errors. This precaution can interfere with the tests, since
    * the test vectors do sometimes repeat nonces. To avoid such problems cipher
    * instances are not reused.
-   * @param algorithm the cipher algorithm including encryption mode and padding.
+   * @param algorithm the cipher algorithm including encryption mode and
+   *     padding.
    * @param opmode one of Cipher.ENCRYPT_MODE or Cipher.DECRYPT_MODE
    * @param key the key bytes
    * @param iv the bytes of the initialization vector
    * @param tagSize the expected size of the tag
    * @return an initialized instance of Cipher
    * @throws Exception if the initialization failed.
-   */ 
-  protected static Cipher getInitializedCipher(
-      String algorithm, int opmode, byte[] key, byte[] iv, int tagSize)
-      throws Exception {
+   */
+  protected static Cipher getInitializedCipher(String algorithm, int opmode,
+                                               byte[] key, byte[] iv,
+                                               int tagSize) throws Exception {
     Cipher cipher = Cipher.getInstance(algorithm);
     if (algorithm.equalsIgnoreCase("AES/GCM/NoPadding")) {
       SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
       GCMParameterSpec parameters = new GCMParameterSpec(tagSize, iv);
       cipher.init(opmode, keySpec, parameters);
-    } else if (algorithm.equalsIgnoreCase("AES/EAX/NoPadding")
-               || algorithm.equalsIgnoreCase("AES/CCM/NoPadding")) {
+    } else if (algorithm.equalsIgnoreCase("AES/EAX/NoPadding") ||
+               algorithm.equalsIgnoreCase("AES/CCM/NoPadding")) {
       SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
       // TODO(bleichen): This works for BouncyCastle but looks non-standard.
-      //   org.bouncycastle.crypto.params.AEADParameters works too, but would add a dependency that
-      //   we want to avoid.
+      //   org.bouncycastle.crypto.params.AEADParameters works too, but would
+      //   add a dependency that we want to avoid.
       GCMParameterSpec parameters = new GCMParameterSpec(tagSize, iv);
       cipher.init(opmode, keySpec, parameters);
     } else if (algorithm.toUpperCase().startsWith("CHACHA")) {
@@ -101,7 +102,8 @@ public class JsonAeadTest {
     return cipher;
   }
 
-  /** Example format for test vectors
+  /**
+   *Example format for test vectors
    * {
    *   "algorithm" : "AES-EAX",
    *   "generatorVersion" : "0.0a14",
@@ -126,16 +128,17 @@ public class JsonAeadTest {
    *         },
    *        ...
    **/
-  // This is a false positive, since errorprone cannot track values passed into a method.
+  // This is a false positive, since errorprone cannot track values passed into
+  // a method.
   @SuppressWarnings("InsecureCryptoUsage")
   public void testAead(String filename, String algorithm) throws Exception {
     // Version number have the format major.minor[.subversion].
-    // Versions before 1.0 are experimental and  use formats that are expected to change.
-    // Versions after 1.0 change the major number if the format changes and change
-    // the minor number if only the test vectors (but not the format) changes.
-    // Subversions are release candidate for the next version.
+    // Versions before 1.0 are experimental and  use formats that are expected
+    // to change. Versions after 1.0 change the major number if the format
+    // changes and change the minor number if only the test vectors (but not the
+    // format) changes. Subversions are release candidate for the next version.
     //
-    // Relevant version changes: 
+    // Relevant version changes:
     // <ul>
     // <li> Version 0.5 adds test vectors for CCM.
     // <li> Version 0.6 adds test vectors for Chacha20-Poly1305.
@@ -147,19 +150,17 @@ public class JsonAeadTest {
     try {
       Cipher.getInstance(algorithm);
     } catch (NoSuchAlgorithmException ex) {
-      System.out.println("Algorithm is not supported. Skipping test for " + algorithm);
+      System.out.println("Algorithm is not supported. Skipping test for " +
+                         algorithm);
       return;
     }
 
     JsonObject test = JsonUtil.getTestVectors(filename);
     String generatorVersion = test.get("generatorVersion").getAsString();
     if (!generatorVersion.equals(expectedVersion)) {
-      System.out.println(
-          algorithm
-              + ": expecting test vectors with version "
-              + expectedVersion
-              + " found vectors with version "
-              + generatorVersion);
+      System.out.println(algorithm + ": expecting test vectors with version " +
+                         expectedVersion + " found vectors with version " +
+                         generatorVersion);
     }
     int numTests = test.get("numberOfTests").getAsInt();
     int cntTests = 0;
@@ -171,22 +172,26 @@ public class JsonAeadTest {
         cntTests++;
         JsonObject testcase = t.getAsJsonObject();
         int tcid = testcase.get("tcId").getAsInt();
-        String tc = "tcId: " + tcid + " " + testcase.get("comment").getAsString();
+        String tc =
+            "tcId: " + tcid + " " + testcase.get("comment").getAsString();
         byte[] key = getBytes(testcase, "key");
         byte[] iv = getBytes(testcase, "iv");
         byte[] msg = getBytes(testcase, "msg");
         byte[] aad = getBytes(testcase, "aad");
-        byte[] ciphertext = join(getBytes(testcase, "ct"), getBytes(testcase, "tag"));
+        byte[] ciphertext =
+            join(getBytes(testcase, "ct"), getBytes(testcase, "tag"));
         // Result is one of "valid", "invalid", "acceptable".
         // "valid" are test vectors with matching plaintext, ciphertext and tag.
-        // "invalid" are test vectors with invalid parameters or invalid ciphertext and tag.
-        // "acceptable" are test vectors with weak parameters or legacy formats.
+        // "invalid" are test vectors with invalid parameters or invalid
+        // ciphertext and tag. "acceptable" are test vectors with weak
+        // parameters or legacy formats.
         String result = testcase.get("result").getAsString();
 
         // Test encryption
         Cipher cipher;
         try {
-          cipher = getInitializedCipher(algorithm, Cipher.ENCRYPT_MODE, key, iv, tagSize);
+          cipher = getInitializedCipher(algorithm, Cipher.ENCRYPT_MODE, key, iv,
+                                        tagSize);
         } catch (GeneralSecurityException ex) {
           // Some libraries restrict key size, iv size and tag size.
           // Because of the initialization of the cipher might fail.
@@ -198,19 +203,18 @@ public class JsonAeadTest {
           boolean eq = arrayEquals(ciphertext, encrypted);
           if (result.equals("invalid")) {
             if (eq) {
-              // Some test vectors use invalid parameters that should be rejected.
-              // E.g. an implementation must never encrypt using AES-GCM with an IV of length 0,
-              // since this leaks the authentication key.
+              // Some test vectors use invalid parameters that should be
+              // rejected. E.g. an implementation must never encrypt using
+              // AES-GCM with an IV of length 0, since this leaks the
+              // authentication key.
               System.out.println("Encrypted " + tc);
               errors++;
             }
           } else {
             if (!eq) {
               System.out.println(
-                  "Incorrect ciphertext for "
-                      + tc
-                      + " ciphertext:"
-                      + TestUtil.bytesToHex(encrypted));
+                  "Incorrect ciphertext for " + tc +
+                  " ciphertext:" + TestUtil.bytesToHex(encrypted));
               errors++;
             }
           }
@@ -224,9 +228,11 @@ public class JsonAeadTest {
         // Test decryption
         Cipher decCipher;
         try {
-          decCipher = getInitializedCipher(algorithm, Cipher.DECRYPT_MODE, key, iv, tagSize);
+          decCipher = getInitializedCipher(algorithm, Cipher.DECRYPT_MODE, key,
+                                           iv, tagSize);
         } catch (GeneralSecurityException ex) {
-          System.out.println("Parameters accepted for encryption but not decryption " + tc);
+          System.out.println(
+              "Parameters accepted for encryption but not decryption " + tc);
           errors++;
           continue;
         }
@@ -235,12 +241,13 @@ public class JsonAeadTest {
           byte[] decrypted = decCipher.doFinal(ciphertext);
           boolean eq = arrayEquals(decrypted, msg);
           if (result.equals("invalid")) {
-            System.out.println("Decrypted invalid ciphertext " + tc + " eq:" + eq);
+            System.out.println("Decrypted invalid ciphertext " + tc +
+                               " eq:" + eq);
             errors++;
           } else {
             if (!eq) {
-              System.out.println(
-                  "Incorrect decryption " + tc + " decrypted:" + TestUtil.bytesToHex(decrypted));
+              System.out.println("Incorrect decryption " + tc + " decrypted:" +
+                                 TestUtil.bytesToHex(decrypted));
             }
           }
         } catch (GeneralSecurityException ex) {
@@ -265,12 +272,11 @@ public class JsonAeadTest {
     testAead("aes_eax_test.json", "AES/EAX/NoPadding");
   }
 
-  @NoPresubmitTest(
-    providers = {ProviderType.BOUNCY_CASTLE},
-    bugs = {"b/111153892"}
-  )
+  @NoPresubmitTest(providers = {ProviderType.BOUNCY_CASTLE},
+                   bugs = {"b/111153892"})
   @Test
-  public void testAesCcm() throws Exception {
+  public void
+  testAesCcm() throws Exception {
     testAead("aes_ccm_test.json", "AES/CCM/NoPadding");
   }
 
@@ -281,22 +287,20 @@ public class JsonAeadTest {
    * jdk11 uses "ChaCha20-Poly1305".
    * ConsCrypt uses "ChaCha20/Poly1305/NoPadding".
    * These two implementations implement RFC 7539.
-   * 
+   *
    * <p>BouncyCastle has a cipher "ChaCha7539". This implementation
    * only implements ChaCha20 with a 12 byte IV. An implementation
    * of RFC 7539 is the class JceChaCha20Poly1305. It is unclear
    * whether this class can be accessed through the JCA interface.
    */
-  @NoPresubmitTest(
-    providers = {ProviderType.BOUNCY_CASTLE},
-    bugs = {"b/117642565"}
-  )
+  @NoPresubmitTest(providers = {ProviderType.BOUNCY_CASTLE},
+                   bugs = {"b/117642565"})
   @Test
-  public void testChaCha20Poly1305() throws Exception {
+  public void
+  testChaCha20Poly1305() throws Exception {
     // A list of potential algorithm names for ChaCha20-Poly1305.
     String[] algorithms =
-        new String[]{"ChaCha20-Poly1305",
-                     "ChaCha20/Poly1305/NoPadding"};
+        new String[] {"ChaCha20-Poly1305", "ChaCha20/Poly1305/NoPadding"};
     for (String name : algorithms) {
       try {
         Cipher.getInstance(name);
@@ -307,5 +311,5 @@ public class JsonAeadTest {
       return;
     }
     System.out.println("ChaCha20-Poly1305 is not supported: skipping test");
-  } 
+  }
 }

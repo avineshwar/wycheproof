@@ -42,42 +42,47 @@ import org.junit.runners.JUnit4;
  */
 // Tested providers:
 // BouncyCastle v 1.52: IESCipher is amazingly buggy, both from a crypto
-// viewpoint and from an engineering viewpoint. It uses encryption modes that are completely
-// inapproriate for ECIES or DHIES (i.e. ECB), the CBC implementation distinguishes between
-// padding and MAC failures allowing adaptive chosen-ciphertext attacks. The implementation
-// allows to specify paddings, but ignores them, encryption using ByteBuffers doesn't even work
+// viewpoint and from an engineering viewpoint. It uses encryption modes that
+// are completely inapproriate for ECIES or DHIES (i.e. ECB), the CBC
+// implementation distinguishes between padding and MAC failures allowing
+// adaptive chosen-ciphertext attacks. The implementation allows to specify
+// paddings, but ignores them, encryption using ByteBuffers doesn't even work
 // without exceptions, indicating that this hasn't even tested.
 //
-// <p> The ECIES interface has changed a few times. The current code is written for
-// BouncyCastle v 1.59.
+// <p> The ECIES interface has changed a few times. The current code is written
+// for BouncyCastle v 1.59.
 //
 // <p>TODO(bleichen):
 // (1) test compressed points,
 // (2) maybe test with CipherInputStream, CipherOutputStream,
-// (3) BouncyCastle has a KeyPairGenerator for ECIES. Is this one different from EC?
-// (4) the tests below cheat to avoid using BouncyCastle specific classes.
-// (5) consider to move into a BouncyCastle specific package, to avoid test restrictions.
+// (3) BouncyCastle has a KeyPairGenerator for ECIES. Is this one different from
+// EC? (4) the tests below cheat to avoid using BouncyCastle specific classes.
+// (5) consider to move into a BouncyCastle specific package, to avoid test
+// restrictions.
 @RunWith(JUnit4.class)
 public class EciesTest {
 
-  int expectedCiphertextLength(String algorithm, int coordinateSize, int messageLength)
-      throws Exception {
+  int expectedCiphertextLength(String algorithm, int coordinateSize,
+                               int messageLength) throws Exception {
     switch (algorithm.toUpperCase()) {
-      case "ECIESWITHAES-CBC":
-        // Uses the encoding
-        // 0x04 || coordinate x || coordinate y || PKCS5 padded ciphertext || 20-byte HMAC-digest.
-        return 1 + (2 * coordinateSize) + (messageLength - messageLength % 16 + 16) + 20;
-      default:
-        fail("Not implemented");
+    case "ECIESWITHAES-CBC":
+      // Uses the encoding
+      // 0x04 || coordinate x || coordinate y || PKCS5 padded ciphertext ||
+      // 20-byte HMAC-digest.
+      return 1 + (2 * coordinateSize) +
+          (messageLength - messageLength % 16 + 16) + 20;
+    default:
+      fail("Not implemented");
     }
     return -1;
   }
 
   /**
-   * Check that key agreement using ECIES works. This example does not specify an IESParametersSpec.
-   * BouncyCastle v.1.52 uses the following algorithms: KDF2 with SHA1 for the key derivation
-   * AES-CBC with PKCS #5 padding. HMAC-SHA1 with a 20 byte digest. The AES and the HMAC key are
-   * both 128 bits.
+   * Check that key agreement using ECIES works. This example does not specify
+   * an IESParametersSpec. BouncyCastle v.1.52 uses the following algorithms:
+   * KDF2 with SHA1 for the key derivation AES-CBC with PKCS #5 padding.
+   * HMAC-SHA1 with a 20 byte digest. The AES and the HMAC key are both 128
+   * bits.
    */
   @SuppressWarnings("InsecureCryptoUsage")
   @Test
@@ -92,9 +97,10 @@ public class EciesTest {
     Cipher ecies = Cipher.getInstance("ECIESwithAES-CBC");
     ecies.init(Cipher.ENCRYPT_MODE, pub);
     // Gets the parameters used.
-    // Getting the parameters here and setting them below for the decryption avoids the use of
-    // org.bouncycastle.jce.spec.IESParameterSpec and hence making the code provider dependent.
-    // The drawback of this approach is that it can only be used in a test environment.
+    // Getting the parameters here and setting them below for the decryption
+    // avoids the use of org.bouncycastle.jce.spec.IESParameterSpec and hence
+    // making the code provider dependent. The drawback of this approach is that
+    // it can only be used in a test environment.
     AlgorithmParameters params = ecies.getParameters();
     byte[] ciphertext = ecies.doFinal(message);
     System.out.println("testEciesBasic:" + TestUtil.bytesToHex(ciphertext));
@@ -104,8 +110,8 @@ public class EciesTest {
   }
 
   /**
-   * BouncyCastle has a key generation algorithm "ECIES". This test checks that the result are
-   * ECKeys in both cases.
+   * BouncyCastle has a key generation algorithm "ECIES". This test checks that
+   * the result are ECKeys in both cases.
    */
   @Test
   public void testKeyGeneration() throws Exception {
@@ -113,19 +119,20 @@ public class EciesTest {
     KeyPairGenerator kf = KeyPairGenerator.getInstance("ECIES");
     kf.initialize(ecSpec);
     KeyPair keyPair = kf.generateKeyPair();
-    ECPrivateKey unusedPriv = (ECPrivateKey) keyPair.getPrivate();
-    ECPublicKey unusedPub = (ECPublicKey) keyPair.getPublic();
+    ECPrivateKey unusedPriv = (ECPrivateKey)keyPair.getPrivate();
+    ECPublicKey unusedPub = (ECPublicKey)keyPair.getPublic();
   }
 
   /**
-   * Tries to decrypt ciphertexts where the symmetric part has been randomized. If this
-   * randomization leads to distinguishable exceptions then this may indicate that the
-   * implementation is vulnerable to a padding attack.
+   * Tries to decrypt ciphertexts where the symmetric part has been randomized.
+   * If this randomization leads to distinguishable exceptions then this may
+   * indicate that the implementation is vulnerable to a padding attack.
    *
    * <p>Problems detected:
    *
    * <ul>
-   *   <li>CVE-2016-1000345 BouncyCastle before v.1.56 is vulnerable to a padding oracle attack.
+   *   <li>CVE-2016-1000345 BouncyCastle before v.1.56 is vulnerable to a
+   * padding oracle attack.
    * </ul>
    */
   @SuppressWarnings("InsecureCryptoUsage")
@@ -154,7 +161,7 @@ public class EciesTest {
     for (int byteNr = kemSize; byteNr < ciphertext.length; byteNr++) {
       for (int bit = 0; bit < 8; bit++) {
         byte[] corrupt = Arrays.copyOf(ciphertext, ciphertext.length);
-        corrupt[byteNr] ^= (byte) (1 << bit);
+        corrupt[byteNr] ^= (byte)(1 << bit);
         ecies.init(Cipher.DECRYPT_MODE, priv, params);
         try {
           ecies.doFinal(corrupt);
@@ -189,11 +196,12 @@ public class EciesTest {
     KeyPair keyPair = kf.generateKeyPair();
     PrivateKey priv = keyPair.getPrivate();
     PublicKey pub = keyPair.getPublic();
-    byte[] message = "This is a long text since we need 32 bytes.".getBytes("UTF-8");
+    byte[] message =
+        "This is a long text since we need 32 bytes.".getBytes("UTF-8");
     Cipher ecies = Cipher.getInstance("ECIESwithAES-CBC");
     ecies.init(Cipher.ENCRYPT_MODE, pub);
     byte[] ciphertext = ecies.doFinal(message);
-    ciphertext[2] ^= (byte) 1;
+    ciphertext[2] ^= (byte)1;
     ecies.init(Cipher.DECRYPT_MODE, priv, ecies.getParameters());
     try {
       ecies.doFinal(ciphertext);
@@ -202,14 +210,15 @@ public class EciesTest {
       // This is as expected
     } catch (Exception ex) {
       fail(
-          "Expected subclass of java.security.GeneralSecurityException, but got: "
-              + ex.getClass().getName());
+          "Expected subclass of java.security.GeneralSecurityException, but got: " +
+          ex.getClass().getName());
     }
   }
 
   /**
-   * This test tries to detect ECIES implementations using ECB. This is insecure and also violates
-   * the claims of ECIES, since ECIES is secure agains adaptive chosen-ciphertext attacks.
+   * This test tries to detect ECIES implementations using ECB. This is insecure
+   * and also violates the claims of ECIES, since ECIES is secure agains
+   * adaptive chosen-ciphertext attacks.
    */
   @SuppressWarnings("InsecureCryptoUsage")
   public void testNotEcb(String algorithm) throws Exception {
@@ -231,9 +240,12 @@ public class EciesTest {
     byte[] message = new byte[512];
     ecies.init(Cipher.ENCRYPT_MODE, pub);
     byte[] ciphertext = ecies.doFinal(message);
-    String block1 = TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, 241, 257));
-    String block2 = TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, 257, 273));
-    assertTrue("Ciphertext repeats:" + TestUtil.bytesToHex(ciphertext), !block1.equals(block2));
+    String block1 =
+        TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, 241, 257));
+    String block2 =
+        TestUtil.bytesToHex(Arrays.copyOfRange(ciphertext, 257, 273));
+    assertTrue("Ciphertext repeats:" + TestUtil.bytesToHex(ciphertext),
+               !block1.equals(block2));
   }
 
   @Test
@@ -254,7 +266,8 @@ public class EciesTest {
   }
 
   /**
-   * This test tries to detect ECIES whether AlgorithmParameters are deterministic.
+   * This test tries to detect ECIES whether AlgorithmParameters are
+   * deterministic.
    */
   @SuppressWarnings("InsecureCryptoUsage")
   public void testAlgorithmParameters(String algorithm) throws Exception {
@@ -289,21 +302,22 @@ public class EciesTest {
       String messageHex = TestUtil.bytesToHex(message);
       String decryptedHex = TestUtil.bytesToHex(decrypted);
       if (messageHex.equals(decryptedHex)) {
-        System.out.println(algorithm + " does (probably) not randomize AlgorithmParameters");
+        System.out.println(
+            algorithm + " does (probably) not randomize AlgorithmParameters");
       } else {
         // This is the most interesting case.
         // The algorithm parameters are randomized but are not authenticated.
-        // This is for example the case for the IV in ECIESWithAES-CBC in BouncyCastle.
-        // If the caller attaches the randomized parameters to the ciphertext then
-        // this would result in malleable encryption.
+        // This is for example the case for the IV in ECIESWithAES-CBC in
+        // BouncyCastle. If the caller attaches the randomized parameters to the
+        // ciphertext then this would result in malleable encryption.
         System.out.println(
-            algorithm + " uses randomized (unauthenticated) AlgorithmParameters."
-                + " message:" + messageHex
-                + " decrypted:" + decryptedHex
-                + "\nparamsA:" + paramsA.toString()
-                + " " + TestUtil.bytesToHex(paramsA.getEncoded())
-                + "\nparamsB:" + paramsB.toString()
-                + " " + TestUtil.bytesToHex(paramsB.getEncoded()));
+            algorithm +
+            " uses randomized (unauthenticated) AlgorithmParameters."
+            + " message:" + messageHex + " decrypted:" + decryptedHex +
+            "\nparamsA:" + paramsA.toString() + " " +
+            TestUtil.bytesToHex(paramsA.getEncoded()) +
+            "\nparamsB:" + paramsB.toString() + " " +
+            TestUtil.bytesToHex(paramsB.getEncoded()));
       }
     } catch (GeneralSecurityException ex) {
       System.out.println(algorithm + " uses randomized AlgorithmParameters");
@@ -315,7 +329,7 @@ public class EciesTest {
     testAlgorithmParameters("ECIES");
     testAlgorithmParameters("ECIESWithAES-CBC");
   }
-  
+
   /**
    * Encryption with ByteBuffers.
    * This test failed with BouncyCastle v 1.52 probably because of this bug
@@ -347,7 +361,8 @@ public class EciesTest {
     ByteBuffer decrypted = ByteBuffer.allocate(message.length);
     cipher.init(Cipher.DECRYPT_MODE, priv, params);
     cipher.doFinal(ctBuffer, decrypted);
-    assertEquals(TestUtil.bytesToHex(message), TestUtil.bytesToHex(decrypted.array()));
+    assertEquals(TestUtil.bytesToHex(message),
+                 TestUtil.bytesToHex(decrypted.array()));
   }
 
   /**
@@ -366,7 +381,8 @@ public class EciesTest {
     KeyPair keyPair = kf.generateKeyPair();
     Cipher ecies = Cipher.getInstance(algorithm);
 
-    int ciphertextLength = expectedCiphertextLength(algorithm, 32, message.length);
+    int ciphertextLength =
+        expectedCiphertextLength(algorithm, 32, message.length);
     byte[] backingArray = new byte[ciphertextLength];
     ByteBuffer ptBuffer = ByteBuffer.wrap(backingArray);
     ptBuffer.put(message);

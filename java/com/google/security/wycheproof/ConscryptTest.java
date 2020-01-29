@@ -22,32 +22,32 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * Conscrypt is a Java security provider that uses OpenSSL. See {@link https://conscrypt.org/}.
- * ConscryptTest excludes {@code @SlowTest} tests.
+ * Conscrypt is a Java security provider that uses OpenSSL. See {@link
+ * https://conscrypt.org/}. ConscryptTest excludes {@code @SlowTest} tests.
  */
 @RunWith(WycheproofRunner.class)
 @SuiteClasses({
-  AesGcmTest.class,
-  BasicTest.class,
-  CipherInputStreamTest.class,
-  CipherOutputStreamTest.class,
-  EcKeyTest.class,
-  EcdhTest.class,
-  EcdsaTest.class,
-  JsonAeadTest.class,
-  JsonCipherTest.class,
-  JsonEcdhTest.class,
-  JsonKeyWrapTest.class,
-  JsonMacTest.class,
-  JsonSignatureTest.class,
-  MacTest.class,
-  MessageDigestTest.class,
-  RsaEncryptionTest.class,
-  RsaKeyTest.class,
-  RsaOaepTest.class,
-  RsaPssTest.class,
-  RsaSignatureTest.class,
-  SecureRandomTest.class,
+    AesGcmTest.class,
+    BasicTest.class,
+    CipherInputStreamTest.class,
+    CipherOutputStreamTest.class,
+    EcKeyTest.class,
+    EcdhTest.class,
+    EcdsaTest.class,
+    JsonAeadTest.class,
+    JsonCipherTest.class,
+    JsonEcdhTest.class,
+    JsonKeyWrapTest.class,
+    JsonMacTest.class,
+    JsonSignatureTest.class,
+    MacTest.class,
+    MessageDigestTest.class,
+    RsaEncryptionTest.class,
+    RsaKeyTest.class,
+    RsaOaepTest.class,
+    RsaPssTest.class,
+    RsaSignatureTest.class,
+    SecureRandomTest.class,
 })
 @Provider(ProviderType.CONSCRYPT)
 @Fast

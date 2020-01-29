@@ -48,8 +48,8 @@ var Ecdsa = function() {};
  * @return {!Promise}
  */
 Ecdsa.verify = function(pk, hashAlg, msg, sig) {
-  return crypto.subtle.verify(
-      {name: 'ECDSA', hash: {name: hashAlg}}, pk, sig, msg);
+  return crypto.subtle.verify({name : 'ECDSA', hash : {name : hashAlg}}, pk,
+                              sig, msg);
 };
 
 /**
@@ -61,14 +61,12 @@ Ecdsa.verify = function(pk, hashAlg, msg, sig) {
  * @return {!Promise}
  */
 Ecdsa.sign = function(sk, msg, hashAlg) {
-  return crypto.subtle.sign(
-      {
-        name: 'ECDSA',
-        hash: {name: hashAlg},
-      },
-      sk, msg);
+  return crypto.subtle.sign({
+    name : 'ECDSA',
+    hash : {name : hashAlg},
+  },
+                            sk, msg);
 };
-
 
 /**
  * Imports a ECDSA public key.
@@ -81,8 +79,8 @@ Ecdsa.sign = function(sk, msg, hashAlg) {
 Ecdsa.importPublicKey = function(keyData, hashAlg, usages) {
   return crypto.subtle.importKey(
       'jwk', keyData,
-      {name: 'ECDSA', namedCurve: keyData['crv'], hash: {name: hashAlg}}, true,
-      usages);
+      {name : 'ECDSA', namedCurve : keyData['crv'], hash : {name : hashAlg}},
+      true, usages);
 };
 
 /**
@@ -91,9 +89,7 @@ Ecdsa.importPublicKey = function(keyData, hashAlg, usages) {
  *
  * @return {!Promise}
  */
-Ecdsa.exportKey = function(key) {
-  return crypto.subtle.exportKey('jwk', key);
-};
+Ecdsa.exportKey = function(key) { return crypto.subtle.exportKey('jwk', key); };
 
 /**
  * Generates an ECDSA key pair using the given hash algorithm and curve name.
@@ -103,14 +99,12 @@ Ecdsa.exportKey = function(key) {
  * @return {!Promise}
  */
 Ecdsa.generateKey = function(hashAlg, curveName) {
-  return crypto.subtle.generateKey(
-      {
-        name: 'ECDSA',
-        namedCurve: curveName,
-      },
-      true, ['sign', 'verify']);
+  return crypto.subtle.generateKey({
+    name : 'ECDSA',
+    namedCurve : curveName,
+  },
+                                   true, [ 'sign', 'verify' ]);
 };
-
 
 /**
  * Tests ECDSA signature verification. The test case's parameters are passed
@@ -121,7 +115,7 @@ Ecdsa.generateKey = function(hashAlg, curveName) {
 Ecdsa.testVerify = function() {
   tc = this;
   var promise = new Promise((resolve, reject) => {
-    Ecdsa.importPublicKey(tc.keyData, tc.hashAlg, ['verify'])
+    Ecdsa.importPublicKey(tc.keyData, tc.hashAlg, [ 'verify' ])
         .then(function(pk) {
           Ecdsa.verify(pk, tc.hashAlg, tc.msg, tc.sig)
               .then(function(isValid) {
@@ -133,8 +127,8 @@ Ecdsa.testVerify = function() {
               })
               .catch(function(err) {
                 // don't expect any exception in signature verification
-                reject(
-                    'Unexpected exception on test case ' + tc.id + ': ' + err);
+                reject('Unexpected exception on test case ' + tc.id + ': ' +
+                       err);
               });
         })
         .catch(function(err) {
@@ -143,7 +137,6 @@ Ecdsa.testVerify = function() {
   });
   return promise;
 };
-
 
 /**
  * Parameters of a ECDSA signature verification test.
@@ -162,7 +155,6 @@ var EcdsaVerifyTestCase = function(id, keyData, hashAlg, msg, sig, result) {
   this.result = result;
   this.hashAlg = hashAlg;
 };
-
 
 /**
  * Tests ECDSA signature implementation with a number of test vectors.
@@ -210,7 +202,7 @@ Ecdsa.extractSig = function(sig) {
   var r = new BigInteger(rBytes);
   var sBytes = bytes.subarray(byteLen / 2, byteLen);
   var s = new BigInteger(sBytes);
-  return [r, s];
+  return [ r, s ];
 };
 
 /**
@@ -241,18 +233,18 @@ Ecdsa.extractNonce = function(h, r, s, d, curveSpec) {
  */
 Ecdsa.checkNonceCorrectness = function(msg, r, s, d, k, curveName) {
   var e2eCurveMap = {
-    'P-256': 'P_256',
-    'P-384': 'P_384',
-    'P-521': 'P_521',
+    'P-256' : 'P_256',
+    'P-384' : 'P_384',
+    'P-521' : 'P_521',
   };
   var e2eCurveName = e2eCurveMap[curveName];
-  var key = new e2e.ecc.Ecdsa(e2eCurveName, {privKey: d.toByteArray()});
+  var key = new e2e.ecc.Ecdsa(e2eCurveName, {privKey : d.toByteArray()});
   var msgBytes = new Uint8Array(msg);
   var calSig = key.signForTestingOnly(msgBytes, k);
   var calR = new BigInteger(calSig['r']);
   var calS = new BigInteger(calSig['s']);
-  assertTrue(
-      'Nonce calculation was incorrect', r.isEqual(calR) && s.isEqual(calS));
+  assertTrue('Nonce calculation was incorrect',
+             r.isEqual(calR) && s.isEqual(calS));
 };
 
 /**
@@ -301,8 +293,10 @@ Ecdsa.testBias = function() {
                                 // Ecdsa.checkNonceCorrectness(tc.msg, r, s, d,
                                 // k, tc.curveName);
                                 var halfN = curveSpec.n.shiftRight(1);
-                                if (k.isBitSet(0)) countLsb += 1;
-                                if (k.compare(halfN) == 1) countMsb += 1;
+                                if (k.isBitSet(0))
+                                  countLsb += 1;
+                                if (k.compare(halfN) == 1)
+                                  countMsb += 1;
                               });
                         }));
               }
@@ -310,17 +304,15 @@ Ecdsa.testBias = function() {
               return Promise.all(promises).then(function() {
                 if (countLsb < tc.minCount ||
                     countLsb > tc.nTests - tc.minCount) {
-                  reject(
-                      'Bias detected in the LSB of k' +
-                      ', hash: ' + tc.hashAlg + ', curve: ' + tc.curveName +
-                      ', countLSB: ' + countLsb + ', countMSB: ' + countMsb);
+                  reject('Bias detected in the LSB of k' +
+                         ', hash: ' + tc.hashAlg + ', curve: ' + tc.curveName +
+                         ', countLSB: ' + countLsb + ', countMSB: ' + countMsb);
                 }
                 if (countMsb < tc.minCount ||
                     countMsb > tc.nTests - tc.minCount) {
-                  reject(
-                      'Bias detected in the MSB of k' +
-                      ', hash: ' + tc.hashAlg + ', curve: ' + tc.curveName +
-                      ', countLSB: ' + countLsb + ', countMSB: ' + countMsb);
+                  reject('Bias detected in the MSB of k' +
+                         ', hash: ' + tc.hashAlg + ', curve: ' + tc.curveName +
+                         ', countLSB: ' + countLsb + ', countMSB: ' + countMsb);
                 }
               });
             })
@@ -328,9 +320,8 @@ Ecdsa.testBias = function() {
               throw new Error('Failed to export private key: ' + err);
             });
       })
-      .catch(function(err) {
-        throw new Error('Failed to generate key: ' + err);
-      });
+      .catch(function(
+          err) { throw new Error('Failed to generate key: ' + err); });
 };
 
 /**
@@ -360,7 +351,7 @@ var EcdsaBiasTestCase = function(hashAlg, curveName, msg, nTests, minCount) {
 function testEcdsaBiasAll() {
   var testCase = new goog.testing.TestCase();
   testCase.promiseTimeout = 120 * 1000;
-  var msg = TestUtil.hexToArrayBuffer('48656c6c6f');  // msg = 'Hello'
+  var msg = TestUtil.hexToArrayBuffer('48656c6c6f'); // msg = 'Hello'
   var nTests = 1024;
   var minCount = 410;
   var biasTest256 =
