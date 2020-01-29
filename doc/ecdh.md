@@ -24,21 +24,20 @@ Failing to check for these problems is a frequent problem:
 
 The test vectors check for the following problems:
 
-*   point is not on curve
-*   point is on twist
-*   curve of public key is used for ECDH
-*   parameters of public key are used for ECDH
+- point is not on curve
+- point is on twist
+- curve of public key is used for ECDH
+- parameters of public key are used for ECDH
 
 ### Countermeasures
 
-*   use point compression. Formats such as X509EncodedKeySpec in Java include
-    bits that indicate whether the point is compressed or not. Hence an attacker
-    can always choose to use uncompressed points as long as this option is
-    incorrectly implemented.
-*   check that public and private key use the same curve
-*   restrict the protocol to named curves
-*   reconstruct the public key explicitly using the parameters of the private
-    key.
+- use point compression. Formats such as X509EncodedKeySpec in Java include bits
+  that indicate whether the point is compressed or not. Hence an attacker can
+  always choose to use uncompressed points as long as this option is incorrectly
+  implemented.
+- check that public and private key use the same curve
+- restrict the protocol to named curves
+- reconstruct the public key explicitly using the parameters of the private key.
 
 ## Side channel attacks that may be detectable by Wycheproof
 
@@ -78,10 +77,10 @@ side channels is not possible in Wycheproof.
 
 ### Countermeasures
 
-*   constant time implementation (does not cover arithmetic errors)
-*   randomization (harder than it looks)
-*   Checking that points are on the curve after point multiplication. (Detects a
-    potential problem, but does not prevent it).
+- constant time implementation (does not cover arithmetic errors)
+- randomization (harder than it looks)
+- Checking that points are on the curve after point multiplication. (Detects a
+  potential problem, but does not prevent it).
 
 ## Invalid encodings
 

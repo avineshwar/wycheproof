@@ -23,15 +23,14 @@ of an "ideal pseudorandom permutation" without a precise definition.
 
 # Ambiguities
 
-There are some minor differences between NIST SP 800 38f and the RFCs.
-NIST does not define a KWP when the wrapped key is 64-bits long. RFC 3394
-specifies in Section 2, that the input for the key wrap algorithm must be at
-least two blocks and otherwise the constant field and key are simply encrypted
-with ECB as a single block.
-Other references are more clear about this. E.g.
+There are some minor differences between NIST SP 800 38f and the RFCs. NIST does
+not define a KWP when the wrapped key is 64-bits long. RFC 3394 specifies in
+Section 2, that the input for the key wrap algorithm must be at least two blocks
+and otherwise the constant field and key are simply encrypted with ECB as a
+single block. Other references are more clear about this. E.g.
 https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#kw-aes128
-(Though the latest version https://www.w3.org/TR/xmlenc-core/
-simply refers to RFC 3394).
+(Though the latest version https://www.w3.org/TR/xmlenc-core/ simply refers to
+RFC 3394).
 
 # Padding oracles (KWP)
 
@@ -56,10 +55,9 @@ padding oracles are present. So one question is whether this is the case here
 too.
 
 An analysis of cryptographic primitives based on strong pseudorandom
-permutations is [[BelRog00]](bib.md#belrog00).
-Theorem 2 implies that checking redundancy in the
-plaintext gives an integrity check is correct, i.e. any constant part in the
-plaintext is useful as integrity check.
+permutations is [[BelRog00]](bib.md#belrog00). Theorem 2 implies that checking
+redundancy in the plaintext gives an integrity check is correct, i.e. any
+constant part in the plaintext is useful as integrity check.
 
 Another property of strong pseudorandom permutations is that the decryption
 D(c') of a modified ciphertext c' does not reveal anything useful about D(c). So
@@ -111,28 +109,30 @@ significant if $$n$$ is large.
 
 ### Distinguishing attack
 
-The forgery attack by
-Ferguson can also be used for a distinguishing attack. The basic goal of the
-distinguishing attack is to show that the underlying construction can be
-distinguished from a random permutation. The attack is a chosen plaintext
-attack. The attacker choses small integers $$k,p$$ and a large number $$n$$.
-The chosen plaintexts are chosen as
+The forgery attack by Ferguson can also be used for a distinguishing attack. The
+basic goal of the distinguishing attack is to show that the underlying
+construction can be distinguished from a random permutation. The attack is a
+chosen plaintext attack. The attacker choses small integers $$k,p$$ and a large
+number $$n$$. The chosen plaintexts are chosen as
 
     k constant semiblocks || p random semiblocks || n constant semiblocks
 
 The observation as above is that it is possible that for two inputs the
 difference in the $$k$$ random semiblocks do not change the entire ciphertext.
-In particular, if there exists blocks $$k+p\leq i_1\leq i_2\leq i_3\leq i_4\leq
-i_5\leq n + k + p,$$ such that the encryption of block $$i_r$$ in round $$r$$
-does not change the second half to the result then the semiblocks $$2\ldots
-k+1$$ of the ciphertexts of the two inputs will be the same. This time
-collisions only need to happen in 5 rounds, and the probability of this
-occurring is larger, i.e. approximately
+In particular, if there exists blocks
+$$k+p\leq i_1\leq i_2\leq i_3\leq i_4\leq
+i_5\leq n + k + p,$$ such that the
+encryption of block $$i_r$$ in round $$r$$ does not change the second half to
+the result then the semiblocks $$2\ldots
+k+1$$ of the ciphertexts of the two
+inputs will be the same. This time collisions only need to happen in 5 rounds,
+and the probability of this occurring is larger, i.e. approximately
 
 $$1/120 (n / 2^h)^5.$$
 
 Additionally this is now a collision attack. If t messages of the form above are
-wrapped then the probability of 2 of them having the same semiblocks $$2\ldots
+wrapped then the probability of 2 of them having the same semiblocks
+$$2\ldots
 k+1$$ is about
 
 $$1/240 (n / 2^h)^5 t^2.$$
@@ -166,5 +166,3 @@ padding are all rejected. implementations of KW do not wrap messages of size 0,
 overflow. Implementations are expected to implement this correctly or reject
 longer inputs. Currently the tests do not fail when a padding oracle is present,
 since such oracles are likely harmless.
-
-

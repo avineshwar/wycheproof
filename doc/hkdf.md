@@ -1,11 +1,11 @@
 # HKDF
 
-[[HKDF]](bib.md#krawczyk10) is a key derivation function proposed by H. Krawczyk.
-A format description of HKDF is in RFC 5869.
+[[HKDF]](bib.md#krawczyk10) is a key derivation function proposed by H.
+Krawczyk. A format description of HKDF is in RFC 5869.
 
 ## Collisions
 
-* Section 3.4 of RFC 5869 specifies that the salt value is not chosen by an
+- Section 3.4 of RFC 5869 specifies that the salt value is not chosen by an
   attacker. If this conditions is violated then the attacker may cause
   unexpected repetitions of pseudorandom streams. Because of properties of the
   underlying HMAC there are distinct salts that lead to the same pseudorandom
@@ -23,9 +23,8 @@ A format description of HKDF is in RFC 5869.
 
 ## Maximal output size
 
-* there is a maxmal output size for HKDF. Generating longer streams can lead to
+- there is a maxmal output size for HKDF. Generating longer streams can lead to
   collisions. RFC 5869 mentions the limit, without explanation and also defines
   HKDF so that it could be used for longer outputs.
 
   TODO: add example
-

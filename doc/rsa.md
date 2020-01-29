@@ -27,19 +27,18 @@ every implementation of the Java platform is required to implement RSA with both
 1024 and 2048 bit key sizes. Hence a 2048 bit default should not lead to
 compatibility problems.
 
-**Private exponent:**
-The private exponent d has to be an integer satisfying
-$$1 \equiv d e \bmod lcm(p-1, q-1)$$ for RSA to work.
-Standards add different additional restrictions for $$d$$.
-RFC 8017 Section 3.2 specifies that $$1\leq d\leq n-1$$.
-Hence computing $$d=e^{-1} \mod\varphi(n)$$ is acceptable.
+**Private exponent:** The private exponent d has to be an integer satisfying
+$$1 \equiv d e \bmod lcm(p-1, q-1)$$ for RSA to work. Standards add different
+additional restrictions for $$d$$. RFC 8017 Section 3.2 specifies that
+$$1\leq d\leq n-1$$. Hence computing $$d=e^{-1} \mod\varphi(n)$$ is acceptable.
 FIPS-PUB-186-4, Appendix B.3.1 specifies that d satisfies
 $$2^{nlen/2}<d<\mbox{lcm}(p-1, q-1).$$
-<!--See also section A.1.1 of FIPS-186-5-draft.-->
-Hence there is at most one valid $$d$$. The lower bound implies
-that $$p-1$$ and $$q-1$$ share a large common factor and therefore
-that factoring the modulus is typically easy.
 
+<!--See also section A.1.1 of FIPS-186-5-draft.-->
+
+Hence there is at most one valid $$d$$. The lower bound implies that $$p-1$$ and
+$$q-1$$ share a large common factor and therefore that factoring the modulus is
+typically easy.
 
 **Cryptographically strong random numbers:** So far the tests check that
 java.util.Random is not used. This needs to be extended.
@@ -58,14 +57,14 @@ messages. The content of the error messages are extremely helpful to potential
 attackers. Bardou et al. [[BFKLSST12]](bib.md#bfklsst12) analyze the difficult
 of attacks based on different types of information leakage. Smart even describes
 an attack that only needs about 40 chosen ciphertexts
-[[Smart10]](bib.md#smart10), though in this case the encryption did not use
-PKCS #1 padding. NIST disallows the use of RSA PKCS #1 v1.5 for key-agreement
-and key-transport after 2023 [[NIST-SP800-131A]](bib.md#nist-sp800-131a).
+[[Smart10]](bib.md#smart10), though in this case the encryption did not use PKCS
+#1 padding. NIST disallows the use of RSA PKCS #1 v1.5 for key-agreement and
+key-transport after 2023 [[NIST-SP800-131A]](bib.md#nist-sp800-131a).
 
 **Bugs**
 
-*   Bouncycastle throws detailed exceptions: InvalidCipherTextException("unknown
-    block type") or InvalidCipherTextException("block padding incorrect").
+- Bouncycastle throws detailed exceptions: InvalidCipherTextException("unknown
+  block type") or InvalidCipherTextException("block padding incorrect").
 
 <!-- the SUN provider used to include that block type -->
 
@@ -93,15 +92,15 @@ to Mangers attack, e.g. [[CVE-2012-5081]](bib.md#cve-2012-5081).
 
 **Potential problems:**
 
-*   Some libraries parse PKCS #1 v1.5 padding during signature verification
-    incorrectly.
-*   Some libraries determine the hash function from the signature (rather than
-    encoding this in the key) Effect:
-*   If the verification is buggy then an attacker might be able to generate
-    signatures for keys with a small (i.e. e=3) public exponent.
-*   If the hash algorithm is not determined by in an authentic manner then
-    preimage attacks against weak hashes are possible, even if the hashes are
-    not used by the signer.
+- Some libraries parse PKCS #1 v1.5 padding during signature verification
+  incorrectly.
+- Some libraries determine the hash function from the signature (rather than
+  encoding this in the key) Effect:
+- If the verification is buggy then an attacker might be able to generate
+  signatures for keys with a small (i.e. e=3) public exponent.
+- If the hash algorithm is not determined by in an authentic manner then
+  preimage attacks against weak hashes are possible, even if the hashes are not
+  used by the signer.
 
 **Countermeasures:** A good way to implement RSA signature verification is
 described in the standard PKCS#1 v.2.2 Section 8.2.2. This standard proposes to
@@ -117,19 +116,19 @@ are based on RFC 8017.
 
 **Potential problems:**
 
-*   The verification of an RSA-PSS signature contains a number of steps, where
-    the correctness of the padding has to be verified. Skipping such checks can
-    lead to similar attacks as with RSA PKCS #1 v1.5 signatures. The necessary
-    steps of the verification are detailed in Section 9.1.2 of RFC 8017.
-    Possibly, this detailed description is preventing similar problems as with
-    RSA PKCS #1 v1.5.
+- The verification of an RSA-PSS signature contains a number of steps, where the
+  correctness of the padding has to be verified. Skipping such checks can lead
+  to similar attacks as with RSA PKCS #1 v1.5 signatures. The necessary steps of
+  the verification are detailed in Section 9.1.2 of RFC 8017. Possibly, this
+  detailed description is preventing similar problems as with RSA PKCS #1 v1.5.
 
 **Compatibility and weak defaults:**
 
 RSA PSS requires to specify a list of parameters. In particular this is a hash
 function for hashing the message, a mask generation function, which typically
-requires to specify a second hash function, salt length and a trailer field.
-The ASN representation is specified in Appendix C of RFC 8017.
+requires to specify a second hash function, salt length and a trailer field. The
+ASN representation is specified in Appendix C of RFC 8017.
+
 <pre>
    RSASSA-PSS-params ::= SEQUENCE {
        hashAlgorithm      [0] HashAlgorithm      DEFAULT sha1,
@@ -138,9 +137,10 @@ The ASN representation is specified in Appendix C of RFC 8017.
        trailerField       [3] TrailerField       DEFAULT trailerFieldBC
    }
 </pre>
-RFC 4055 defines a number of identifiers for RSA-PSS in Section 6. The
-proposed identifiers use the same hash function for the message and the mask
-generation. The salt length is always 20.
+
+RFC 4055 defines a number of identifiers for RSA-PSS in Section 6. The proposed
+identifiers use the same hash function for the message and the mask generation.
+The salt length is always 20.
 
 These specifications lead to a number of problems, since implementations do not
 always require that all parameters are specified and hence some default values

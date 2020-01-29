@@ -90,14 +90,16 @@ is encrypted or decrypted incorrectly. The attacker waits until he has 8 or 9
 rejected messages. An incorrect decryption indicates that a counter overflow
 occurred, and hence that the initial counter was
 `0x????????????????????ffff????`, where ? or unknown nibbles. The initial
-counter J0 is computed over $$\mbox{GF}(2^{128})$$ as $$J_0 = \mbox{IV} * H^2 +
-\mbox{len}(\mbox{IV})\cdot H$$ where H is the authentication key. Hence, $$J_0$$
-is a linear function of H over $$\mbox{GF}(2^{128})$$. Equivalently, the
-equation above is a system of 128 linear equations over $$\mbox{GF}(2)$$, i.e.
-one equation for each bit of $$J_0$$. Under the assumptions above 16 bits of J0
-are known for each message that is rejected. Knowing 8 or 9 rejected messages
-give 128 or 144 linear equations over $$\mbox{GF}(2)$$ with the 128 bits of H as
-unknowns. Hence, we expect that the system is solvable with high probability.
+counter J0 is computed over $$\mbox{GF}(2^{128})$$ as
+$$J_0 = \mbox{IV} * H^2 +
+\mbox{len}(\mbox{IV})\cdot H$$ where H is the
+authentication key. Hence, $$J_0$$ is a linear function of H over
+$$\mbox{GF}(2^{128})$$. Equivalently, the equation above is a system of 128
+linear equations over $$\mbox{GF}(2)$$, i.e. one equation for each bit of
+$$J_0$$. Under the assumptions above 16 bits of J0 are known for each message
+that is rejected. Knowing 8 or 9 rejected messages give 128 or 144 linear
+equations over $$\mbox{GF}(2)$$ with the 128 bits of H as unknowns. Hence, we
+expect that the system is solvable with high probability.
 
 If the size of the encrypted messages is smaller, then less corrupt messages are
 necessary but more encryptions are necessary until sufficiently many bugs occur.
@@ -133,9 +135,9 @@ tag : "5281efc7f13ac8e14ccf5dca7bfbfdd1",
 ```
 
 ### Failing providers
+
 The AES-GCM implementation in jdk9 handled CTR overflows incorrectly
 [[CVE-2018-2972]](bib.md#cve-2018-2972).
-
 
 ## 0 size IV
 

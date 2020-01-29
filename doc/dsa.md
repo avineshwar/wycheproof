@@ -11,20 +11,20 @@ descripted in the digital signature standard [[FIPS-186-4]](bib.md#fips-186-4).
 the following choices for the pair (L,N), where L is the size of p in bits and N
 is the size of q in bits:
 
-L    | N
----: | --:
-1024 | 160
-2048 | 224
-2048 | 256
-3072 | 256
+|    L |   N |
+| ---: | --: |
+| 1024 | 160 |
+| 2048 | 224 |
+| 2048 | 256 |
+| 3072 | 256 |
 
 The tests expect the following properties of the parameters used during key
 generation:
 
-*   If only the parameter L is specified by the caller then N should be one of
-    the options proposed in [[FIPS-186-4]](bib.md#fips-186-4).
-*   If no size is specified then L should be at least 2048. This is the minimal
-    key size recommended by NIST for the period up to the year 2030.
+- If only the parameter L is specified by the caller then N should be one of the
+  options proposed in [[FIPS-186-4]](bib.md#fips-186-4).
+- If no size is specified then L should be at least 2048. This is the minimal
+  key size recommended by NIST for the period up to the year 2030.
 
 ## Signature generation
 
@@ -41,7 +41,9 @@ leaking the private keys.
 
 A DSA signature is a DER encoded tuple of two integers (r,s). To verify a
 signature the verifier first checks $$0 < r < q$$ and $$0 < s < q$$.
+
 <!-- Some libraries don't check that r and s are integers.-->
+
 The verifier then computes:
 
 $$
@@ -62,7 +64,8 @@ of simply if the implementations is buggy (pycrypto). if additionally to such a
 bug the range of r,s is not or incorrectly tested then it might be feasible to
 forge signatures with the values (r=1, s=0) or (r=1, s=q). In particular, if a
 library can be forced to compute $$s^{-1} \mod q = 0$$ then the verification
-would compute $$ w = u1 = u2 = 0 $$ and hence $$ (g^{u1}y^{u2} \mod p) \mod q =
+would compute $$ w = u1 = u2 = 0 $$ and hence
+$$ (g^{u1}y^{u2} \mod p) \mod q =
 1 .$$
 
 ## Timing attacks
