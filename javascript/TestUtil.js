@@ -17,10 +17,10 @@
 /**
  * Some utilities for all Javascript tests.
  */
-goog.provide('wycheproof.TestUtil');
-goog.require('goog.crypt');
-goog.require('goog.crypt.base64');
-goog.require('goog.json');
+goog.provide("wycheproof.TestUtil");
+goog.require("goog.crypt");
+goog.require("goog.crypt.base64");
+goog.require("goog.json");
 
 /**
  * Reads test vectors in JSON format from a file.
@@ -30,8 +30,10 @@ goog.require('goog.json');
  */
 wycheproof.TestUtil.readJsonTestVectorsFromFile = function(filename) {
   var fileContent = goog.loadFileSync_(filename);
-  assertTrue('Invalid file format (expected JSON)',
-             goog.json.isValid(fileContent));
+  assertTrue(
+    "Invalid file format (expected JSON)",
+    goog.json.isValid(fileContent)
+  );
   return JSON.parse(fileContent);
 };
 
@@ -41,10 +43,10 @@ wycheproof.TestUtil.readJsonTestVectorsFromFile = function(filename) {
  * @param {!goog.testing.TestCase.Result} result
  */
 wycheproof.TestUtil.checkTestCaseResult = function(result) {
-  var failMsg = '';
+  var failMsg = "";
   if (result.errors.length > 0) {
     for (var i = 0; i < result.errors.length; i++) {
-      failMsg += result.errors[i].message + '\n';
+      failMsg += result.errors[i].message + "\n";
     }
     fail(failMsg);
   }
@@ -56,8 +58,9 @@ wycheproof.TestUtil.checkTestCaseResult = function(result) {
  *
  * @return {!boolean}
  */
-wycheproof.TestUtil.isHex = function(
-    s) { return /(^[0-9A-F]*$)|(^[0-9a-f]*$)/.test(s); };
+wycheproof.TestUtil.isHex = function(s) {
+  return /(^[0-9A-F]*$)|(^[0-9a-f]*$)/.test(s);
+};
 
 /**
  * Converts a hex string to a ArrayBuffer.
@@ -76,8 +79,9 @@ wycheproof.TestUtil.hexToArrayBuffer = function(s) {
  *
  * @return {!string}
  */
-wycheproof.TestUtil.arrayBufferToHex = function(
-    ab) { return goog.crypt.byteArrayToHex(new Uint8Array(ab)); };
+wycheproof.TestUtil.arrayBufferToHex = function(ab) {
+  return goog.crypt.byteArrayToHex(new Uint8Array(ab));
+};
 
 /**
  * Converts a Base64URL string to hex format
@@ -118,8 +122,12 @@ wycheproof.TestUtil.base64ToHex = function(s) {
  *
  * @return {!string}
  */
-wycheproof.TestUtil.base64ToBase64Url = function(
-    s) { return s.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''); };
+wycheproof.TestUtil.base64ToBase64Url = function(s) {
+  return s
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+};
 
 /**
  * Converts a Base64Url string to Base64
@@ -128,7 +136,7 @@ wycheproof.TestUtil.base64ToBase64Url = function(
  * @return {!string}
  */
 wycheproof.TestUtil.base64UrlToBase64 = function(s) {
-  return (s + '==='.slice((s.length + 3) % 4))
-      .replace(/\-/g, '+')
-      .replace(/_/g, '/');
+  return (s + "===".slice((s.length + 3) % 4))
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
 };

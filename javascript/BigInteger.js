@@ -18,14 +18,14 @@
  * @fileoverview Defines interfaces for big numbers.
  * All arithmetic operations are inherits from e2e.BigNum.
  */
-goog.provide('wycheproof.BigInteger');
-goog.provide('wycheproof.BigPrimeInteger');
-goog.require('e2e.BigNum');
-goog.require('e2e.BigPrimeNum');
-goog.require('goog.crypt');
-goog.require('goog.crypt.base64');
-goog.require('goog.testing.asserts');
-goog.require('wycheproof.TestUtil');
+goog.provide("wycheproof.BigInteger");
+goog.provide("wycheproof.BigPrimeInteger");
+goog.require("e2e.BigNum");
+goog.require("e2e.BigPrimeNum");
+goog.require("goog.crypt");
+goog.require("goog.crypt.base64");
+goog.require("goog.testing.asserts");
+goog.require("wycheproof.TestUtil");
 
 var TestUtil = wycheproof.TestUtil;
 
@@ -36,8 +36,9 @@ var TestUtil = wycheproof.TestUtil;
  * @constructor
  * @extends {e2e.BigNum}
  */
-wycheproof.BigInteger = function(
-    optValue) { wycheproof.BigInteger.base(this, 'constructor', optValue); };
+wycheproof.BigInteger = function(optValue) {
+  wycheproof.BigInteger.base(this, "constructor", optValue);
+};
 goog.inherits(wycheproof.BigInteger, e2e.BigNum);
 
 /**
@@ -48,9 +49,9 @@ goog.inherits(wycheproof.BigInteger, e2e.BigNum);
  * @return {!BigInteger}
  */
 wycheproof.BigInteger.fromHex = function(s) {
-  assertTrue('Input is not a hex string', TestUtil.isHex(s));
+  assertTrue("Input is not a hex string", TestUtil.isHex(s));
   if (s.length % 2 == 1) {
-    s = '0' + s;
+    s = "0" + s;
   }
   var bytes = goog.crypt.hexToByteArray(s);
   var bigInt = new wycheproof.BigInteger(bytes);
@@ -99,6 +100,7 @@ wycheproof.BigInteger.prototype.toArrayBuffer = function(optValue) {
  * @constructor
  * @extends {e2e.BigPrimeNum}
  */
-wycheproof.BigPrimeInteger = function(
-    modulus) { wycheproof.BigPrimeInteger.base(this, 'constructor', modulus); };
+wycheproof.BigPrimeInteger = function(modulus) {
+  wycheproof.BigPrimeInteger.base(this, "constructor", modulus);
+};
 goog.inherits(wycheproof.BigPrimeInteger, e2e.BigPrimeNum);

@@ -17,13 +17,13 @@
 /**
  * @fileoverview Utilities for hash operations
  */
-goog.provide('wycheproof.webcryptoapi.HashUtil');
+goog.provide("wycheproof.webcryptoapi.HashUtil");
 
 // Hash function names
-wycheproof.webcryptoapi.HashUtil.SHA256 = 'SHA-256';
-wycheproof.webcryptoapi.HashUtil.SHA384 = 'SHA-384';
-wycheproof.webcryptoapi.HashUtil.SHA512 = 'SHA-512';
-wycheproof.webcryptoapi.HashUtil.SHA1 = 'SHA-1';
+wycheproof.webcryptoapi.HashUtil.SHA256 = "SHA-256";
+wycheproof.webcryptoapi.HashUtil.SHA384 = "SHA-384";
+wycheproof.webcryptoapi.HashUtil.SHA512 = "SHA-512";
+wycheproof.webcryptoapi.HashUtil.SHA1 = "SHA-1";
 
 /**
  * Calculates a hash of the given message using the given hash algorithm.
@@ -32,5 +32,6 @@ wycheproof.webcryptoapi.HashUtil.SHA1 = 'SHA-1';
  *
  * @return {!Promise}
  */
-wycheproof.webcryptoapi.HashUtil.digest = function(
-    hashAlg, msg) { return window.crypto.subtle.digest(hashAlg, msg); };
+wycheproof.webcryptoapi.HashUtil.digest = function(hashAlg, msg) {
+  return window.crypto.subtle.digest(hashAlg, msg);
+};

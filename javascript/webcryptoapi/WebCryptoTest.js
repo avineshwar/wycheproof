@@ -16,9 +16,9 @@
 /**
  * @fileoverview Tests for Web Crypto API
  */
-goog.provide('wycheproof.webcryptoapi');
-goog.require('goog.testing.TestCase');
-goog.require('goog.userAgent.product');
+goog.provide("wycheproof.webcryptoapi");
+goog.require("goog.testing.TestCase");
+goog.require("goog.userAgent.product");
 
 const TEST_TIMEOUT = 120 * 1000;
 
@@ -27,30 +27,30 @@ const TEST_TIMEOUT = 120 * 1000;
 var SUPPORTED;
 // Parameters that are supported by Microsoft Edge
 const EDGE_SUPPORTED = {
-  'aesgcm-key-size' : [ 128, 192, 256 ],
-  'ecdsa-curve' : [ 'P-256', 'P-384', 'P-521' ],
-  'hash' : [ 'SHA-256', 'SHA-384', 'SHA-512' ]
+  "aesgcm-key-size": [128, 192, 256],
+  "ecdsa-curve": ["P-256", "P-384", "P-521"],
+  hash: ["SHA-256", "SHA-384", "SHA-512"]
 };
 // Parameters that are supported by Chrome
 const CHROME_SUPPORTED = {
-  'aesgcm-key-size' : [ 128, 256 ],
-  'ecdsa-curve' : [ 'P-256', 'P-384', 'P-521' ],
-  'hash' : [ 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512' ]
+  "aesgcm-key-size": [128, 256],
+  "ecdsa-curve": ["P-256", "P-384", "P-521"],
+  hash: ["SHA-1", "SHA-256", "SHA-384", "SHA-512"]
 };
 // Parameters that are supported by Firefox
 const FIREFOX_SUPPORTED = {
-  'aesgcm-key-size' : [ 128, 192, 256 ],
-  'ecdsa-curve' : [ 'P-256', 'P-384', 'P-521' ],
-  'hash' : [ 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512' ]
+  "aesgcm-key-size": [128, 192, 256],
+  "ecdsa-curve": ["P-256", "P-384", "P-521"],
+  hash: ["SHA-1", "SHA-256", "SHA-384", "SHA-512"]
 };
 
 // Test names
-const TEST_AES_GCM_VECTORS = 'testAesGcmVectors';
-const TEST_ECDSA_VECTORS = 'testEcdsaVectors';
-const TEST_ECDSA_BIAS = 'testEcdsaBiasAll';
-const TEST_RSASSAPKCS1_VECTORS = 'testRsaSsaPkcs1Vectors';
-const TEST_RSA_ENCRYPT = 'testRsaEncryptionException';
-const TEST_ECDH_VECTORS = 'testEcdhVectors';
+const TEST_AES_GCM_VECTORS = "testAesGcmVectors";
+const TEST_ECDSA_VECTORS = "testEcdsaVectors";
+const TEST_ECDSA_BIAS = "testEcdsaBiasAll";
+const TEST_RSASSAPKCS1_VECTORS = "testRsaSsaPkcs1Vectors";
+const TEST_RSA_ENCRYPT = "testRsaEncryptionException";
+const TEST_ECDH_VECTORS = "testEcdhVectors";
 
 // Tests to run
 var TESTS_ALL = {};

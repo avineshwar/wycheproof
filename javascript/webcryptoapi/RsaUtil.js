@@ -17,19 +17,19 @@
 /**
  * Some utilities for testing RSA on Web Crypto APIs
  */
-goog.provide('wycheproof.webcryptoapi.RsaUtil');
-goog.require('goog.testing.asserts');
-goog.require('wycheproof.webcryptoapi.HashUtil');
+goog.provide("wycheproof.webcryptoapi.RsaUtil");
+goog.require("goog.testing.asserts");
+goog.require("wycheproof.webcryptoapi.HashUtil");
 
 var HashUtil = wycheproof.webcryptoapi.HashUtil;
 
 // algorithm names
-wycheproof.webcryptoapi.RsaUtil.RSASSA_PKCS1 = 'RSASSA-PKCS1-v1_5';
-wycheproof.webcryptoapi.RsaUtil.RSA_OAEP = 'RSA-OAEP';
+wycheproof.webcryptoapi.RsaUtil.RSASSA_PKCS1 = "RSASSA-PKCS1-v1_5";
+wycheproof.webcryptoapi.RsaUtil.RSA_OAEP = "RSA-OAEP";
 
 // public exponents
-wycheproof.webcryptoapi.RsaUtil.E_65537 = new Uint8Array([ 0x01, 0x00, 0x01 ]);
-wycheproof.webcryptoapi.RsaUtil.E_3 = new Uint8Array([ 0x03 ]);
+wycheproof.webcryptoapi.RsaUtil.E_65537 = new Uint8Array([0x01, 0x00, 0x01]);
+wycheproof.webcryptoapi.RsaUtil.E_3 = new Uint8Array([0x03]);
 
 /**
  * Imports a RSA public key.
@@ -44,19 +44,28 @@ wycheproof.webcryptoapi.RsaUtil.E_3 = new Uint8Array([ 0x03 ]);
  *
  * @return {!Promise} A Promise object containing the public key
  */
-wycheproof.webcryptoapi.RsaUtil.importPublicKey = function(e, n, schemeName,
-                                                           hashAlg, usages) {
-  return window.crypto.subtle.importKey('jwk', {
-    kty : 'RSA',
-    e : e,
-    n : n,
-    ext : true,
-  },
-                                        {
-                                          name : schemeName,
-                                          hash : {name : hashAlg},
-                                        },
-                                        false, usages);
+wycheproof.webcryptoapi.RsaUtil.importPublicKey = function(
+  e,
+  n,
+  schemeName,
+  hashAlg,
+  usages
+) {
+  return window.crypto.subtle.importKey(
+    "jwk",
+    {
+      kty: "RSA",
+      e: e,
+      n: n,
+      ext: true
+    },
+    {
+      name: schemeName,
+      hash: { name: hashAlg }
+    },
+    false,
+    usages
+  );
 };
 
 /**
@@ -71,10 +80,19 @@ wycheproof.webcryptoapi.RsaUtil.importPublicKey = function(e, n, schemeName,
  *
  * @return {!Promise} A Promise object containing the verification result.
  */
-wycheproof.webcryptoapi.RsaUtil.verify = function(pk, msg, sig, hashAlg,
-                                                  schemeName) {
-  return window.crypto.subtle.verify({name : schemeName, hash : hashAlg}, pk,
-                                     sig, msg);
+wycheproof.webcryptoapi.RsaUtil.verify = function(
+  pk,
+  msg,
+  sig,
+  hashAlg,
+  schemeName
+) {
+  return window.crypto.subtle.verify(
+    { name: schemeName, hash: hashAlg },
+    pk,
+    sig,
+    msg
+  );
 };
 
 /**
@@ -87,15 +105,23 @@ wycheproof.webcryptoapi.RsaUtil.verify = function(pk, msg, sig, hashAlg,
  *
  * @return {!Promise} A promise containing the new key pair.
  */
-wycheproof.webcryptoapi.RsaUtil.generateKey = function(schemeName, keySize, e,
-                                                       hashAlg, usages) {
-  return window.crypto.subtle.generateKey({
-    name : schemeName,
-    modulusLength : keySize,
-    publicExponent : e,
-    hash : {name : hashAlg},
-  },
-                                          true, usages);
+wycheproof.webcryptoapi.RsaUtil.generateKey = function(
+  schemeName,
+  keySize,
+  e,
+  hashAlg,
+  usages
+) {
+  return window.crypto.subtle.generateKey(
+    {
+      name: schemeName,
+      modulusLength: keySize,
+      publicExponent: e,
+      hash: { name: hashAlg }
+    },
+    true,
+    usages
+  );
 };
 
 /**
@@ -106,9 +132,9 @@ wycheproof.webcryptoapi.RsaUtil.generateKey = function(schemeName, keySize, e,
  *
  * @return {!Promise} A promise containing the decrypted text.
  */
-wycheproof.webcryptoapi.RsaUtil.decrypt = function(
-    schemeName, sk,
-    ct) { return window.crypto.subtle.decrypt({name : schemeName}, sk, ct); };
+wycheproof.webcryptoapi.RsaUtil.decrypt = function(schemeName, sk, ct) {
+  return window.crypto.subtle.decrypt({ name: schemeName }, sk, ct);
+};
 
 /**
  * A class containing RSA signature test case's parameters
@@ -122,7 +148,15 @@ wycheproof.webcryptoapi.RsaUtil.decrypt = function(
  * @param {!string} result The test result
  */
 wycheproof.webcryptoapi.RsaUtil.RsaSignatureTestCase = function(
-    id, e, n, hashAlg, scheme, msg, sig, result) {
+  id,
+  e,
+  n,
+  hashAlg,
+  scheme,
+  msg,
+  sig,
+  result
+) {
   this.id = id;
   this.e = e;
   this.n = n;
@@ -141,27 +175,34 @@ wycheproof.webcryptoapi.RsaUtil.RsaSignatureTestCase = function(
 wycheproof.webcryptoapi.RsaUtil.testVerification = function() {
   var tc = this;
   var promise = new Promise(function(resolve, reject) {
-    RsaUtil.importPublicKey(tc.e, tc.n, tc.scheme, tc.hashAlg, [ 'verify' ])
-        .then(function(pk) {
-          wycheproof.webcryptoapi.RsaUtil
-              .verify(pk, tc.msg, tc.sig, tc.hashAlg, tc.scheme)
-              .then(function(isValid) {
-                if ((tc.result == 'valid' && !isValid) ||
-                    (tc.result == 'invalid' && isValid)) {
-                  reject('Failed on test case ' + tc.id);
-                }
-                resolve();
-              })
-              .catch(function(err) {
-                // don't expect any exception in signature verification
-                reject('Unexpected exception on test case ' + tc.id + ": " +
-                       err);
-              });
-        })
-        .catch(function(err) {
-          reject('Failed to import public key in test case ' + tc.id + ': ' +
-                 err);
-        });
+    RsaUtil.importPublicKey(tc.e, tc.n, tc.scheme, tc.hashAlg, ["verify"])
+      .then(function(pk) {
+        wycheproof.webcryptoapi.RsaUtil.verify(
+          pk,
+          tc.msg,
+          tc.sig,
+          tc.hashAlg,
+          tc.scheme
+        )
+          .then(function(isValid) {
+            if (
+              (tc.result == "valid" && !isValid) ||
+              (tc.result == "invalid" && isValid)
+            ) {
+              reject("Failed on test case " + tc.id);
+            }
+            resolve();
+          })
+          .catch(function(err) {
+            // don't expect any exception in signature verification
+            reject("Unexpected exception on test case " + tc.id + ": " + err);
+          });
+      })
+      .catch(function(err) {
+        reject(
+          "Failed to import public key in test case " + tc.id + ": " + err
+        );
+      });
   });
   return promise;
 };

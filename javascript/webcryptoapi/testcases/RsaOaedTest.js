@@ -17,12 +17,12 @@
 /**
  * Tests for RSA-OAEP encryption implementations of Web Crypto API.
  */
-goog.provide('wycheproof.webcryptoapi.RSA-OAED');
-goog.require('e2e.random');
-goog.require('goog.testing.asserts');
-goog.require('goog.testing.jsunit');
-goog.require('wycheproof.TestUtil');
-goog.require('wycheproof.webcryptoapi.RsaUtil');
+goog.provide("wycheproof.webcryptoapi.RSA-OAED");
+goog.require("e2e.random");
+goog.require("goog.testing.asserts");
+goog.require("goog.testing.jsunit");
+goog.require("wycheproof.TestUtil");
+goog.require("wycheproof.webcryptoapi.RsaUtil");
 
 var RsaUtil = wycheproof.webcryptoapi.RsaUtil;
 var TestUtil = wycheproof.TestUtil;
@@ -75,38 +75,42 @@ function testRsaEncryptionException() {
     var scheme = RsaUtil.RSA_OAEP;
     var keySize = 1024;
     var e = RsaUtil.E_65537;
-    var hashAlg = 'SHA-256';
-    var usages = [ 'encrypt', 'decrypt' ];
+    var hashAlg = "SHA-256";
+    var usages = ["encrypt", "decrypt"];
     var ctLen = keySize / 8;
     var nTest = 1000;
     var nDone = 0;
     var exceptions = new Set();
     RsaUtil.generateKey(scheme, keySize, e, hashAlg, usages)
-        .then(function(key) {
-          for (var i = 0; i < nTest; i++) {
-            var ct = new Uint8Array(e2e.random.getRandomBytes(ctLen)).buffer;
-            RsaUtil.decrypt(scheme, key.privateKey, ct)
-                .then(function(pt) {
-                  reject(
-                      'RSA-OAEP decryption should not succeed on random bytes');
-                })
-                .catch(function(err) {
-                  exceptions.add(err.name + ': ' + err.message);
-                  nDone += 1;
-                  if (nDone == nTest) {
-                    if (exceptions.size > 1) {
-                      var msg =
-                          'Exceptions leak information about the padding for ' +
-                          scheme + '\n';
-                      exceptions.forEach(function(e) { msg += e; });
-                      reject(msg);
-                    }
-                    resolve();
-                  }
-                });
-          }
-        })
-        .catch(function(err) { reject('Failed to generate key: ' + err); });
+      .then(function(key) {
+        for (var i = 0; i < nTest; i++) {
+          var ct = new Uint8Array(e2e.random.getRandomBytes(ctLen)).buffer;
+          RsaUtil.decrypt(scheme, key.privateKey, ct)
+            .then(function(pt) {
+              reject("RSA-OAEP decryption should not succeed on random bytes");
+            })
+            .catch(function(err) {
+              exceptions.add(err.name + ": " + err.message);
+              nDone += 1;
+              if (nDone == nTest) {
+                if (exceptions.size > 1) {
+                  var msg =
+                    "Exceptions leak information about the padding for " +
+                    scheme +
+                    "\n";
+                  exceptions.forEach(function(e) {
+                    msg += e;
+                  });
+                  reject(msg);
+                }
+                resolve();
+              }
+            });
+        }
+      })
+      .catch(function(err) {
+        reject("Failed to generate key: " + err);
+      });
   });
   return promise;
 }

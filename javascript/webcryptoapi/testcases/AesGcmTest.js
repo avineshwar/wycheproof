@@ -23,19 +23,19 @@
  * - Tests invalid parameters
  */
 
-goog.provide('wycheproof.webcryptoapi.AES-GCM');
-goog.require('goog.testing.TestCase');
-goog.require('goog.testing.asserts');
-goog.require('goog.testing.jsunit');
-goog.require('goog.userAgent.product');
-goog.require('wycheproof.BigInteger');
-goog.require('wycheproof.TestUtil');
+goog.provide("wycheproof.webcryptoapi.AES-GCM");
+goog.require("goog.testing.TestCase");
+goog.require("goog.testing.asserts");
+goog.require("goog.testing.jsunit");
+goog.require("goog.userAgent.product");
+goog.require("wycheproof.BigInteger");
+goog.require("wycheproof.TestUtil");
 
 var TestUtil = wycheproof.TestUtil;
 var BigInteger = wycheproof.BigInteger;
 
 // Test vector file
-var AES_GCM_VECTOR_FILE = '../../testvectors/aes_gcm_test.json';
+var AES_GCM_VECTOR_FILE = "../../testvectors/aes_gcm_test.json";
 
 /**
  * A class containing a AES-GCM test case's parameters.
@@ -51,8 +51,19 @@ var AES_GCM_VECTOR_FILE = '../../testvectors/aes_gcm_test.json';
  * @param {!string} ct The expected ciphertext of the encryption in hex format
  * @param {!string} result The expected result of the test
  */
-var AesGcmTestCase = function(id, k, keySize, tag, tagSize, iv, ivSize, aad,
-                              msg, ct, result) {
+var AesGcmTestCase = function(
+  id,
+  k,
+  keySize,
+  tag,
+  tagSize,
+  iv,
+  ivSize,
+  aad,
+  msg,
+  ct,
+  result
+) {
   this.id = id;
   this.k = k;
   this.keySize = keySize;
@@ -75,7 +86,9 @@ var AesGcm = function() {};
  *
  * @return {!string} The algorithm's name
  */
-AesGcm.getAlgName = function(keySize) { return 'A' + keySize + 'GCM'; };
+AesGcm.getAlgName = function(keySize) {
+  return "A" + keySize + "GCM";
+};
 
 /**
  * Imports a AES-GCM key.
@@ -85,16 +98,20 @@ AesGcm.getAlgName = function(keySize) { return 'A' + keySize + 'GCM'; };
  * @return {!Promise} A Promise containing the imported key
  */
 AesGcm.importKey = function(k, keySize) {
-  return window.crypto.subtle.importKey("jwk", {
-    kty : 'oct',
-    k : k,
-    alg : AesGcm.getAlgName(keySize),
-    ext : true,
-  },
-                                        {
-                                          name : 'AES-GCM',
-                                        },
-                                        true, [ "encrypt", "decrypt" ]);
+  return window.crypto.subtle.importKey(
+    "jwk",
+    {
+      kty: "oct",
+      k: k,
+      alg: AesGcm.getAlgName(keySize),
+      ext: true
+    },
+    {
+      name: "AES-GCM"
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
 };
 
 /**
@@ -108,7 +125,7 @@ AesGcm.importKey = function(k, keySize) {
  * @return {!Promise} A Promise containing the ciphetext
  */
 AesGcm.encrypt = function(key, aad, msg, iv, tagSize) {
-  var alg = {name : 'AES-GCM', iv : iv, tagLength : tagSize};
+  var alg = { name: "AES-GCM", iv: iv, tagLength: tagSize };
   if (aad.byteLength > 0) {
     alg.additionalData = aad;
   }
@@ -124,32 +141,36 @@ AesGcm.testEncrypt = function() {
   var tc = this;
   var promise = new Promise(function(resolve, reject) {
     AesGcm.importKey(tc.k, tc.keySize)
-        .then(function(key) {
-          AesGcm.encrypt(key, tc.aad, tc.msg, tc.iv, tc.tagSize)
-              .then(function(ct) {
-                // Fail if the iv is empty and the encryption still succeeds
-                if (tc.ivSize == 0) {
-                  reject('Failed on test case ' + tc.id +
-                         ': 0-length iv should not be accepted');
-                } else {
-                  var obtainedCt = TestUtil.arrayBufferToHex(ct);
-                  var expectedCt = tc.ct + tc.tag;
-                  if ((tc.result == 'valid' && obtainedCt != expectedCt) ||
-                      (tc.result == 'invalid' && obtainedCt == expectedCt)) {
-                    reject('Failed on test case ' + tc.id);
-                  }
-                }
-                resolve();
-              })
-              .catch(function(err) {
-                // don't expect any exception during encryption
-                reject('Unexpected exception on test case ' + tc.id + ': ' +
-                       err);
-              });
-        })
-        .catch(function(err) {
-          reject('Failed to import key in test case ' + tc.id + ': ' + err);
-        });
+      .then(function(key) {
+        AesGcm.encrypt(key, tc.aad, tc.msg, tc.iv, tc.tagSize)
+          .then(function(ct) {
+            // Fail if the iv is empty and the encryption still succeeds
+            if (tc.ivSize == 0) {
+              reject(
+                "Failed on test case " +
+                  tc.id +
+                  ": 0-length iv should not be accepted"
+              );
+            } else {
+              var obtainedCt = TestUtil.arrayBufferToHex(ct);
+              var expectedCt = tc.ct + tc.tag;
+              if (
+                (tc.result == "valid" && obtainedCt != expectedCt) ||
+                (tc.result == "invalid" && obtainedCt == expectedCt)
+              ) {
+                reject("Failed on test case " + tc.id);
+              }
+            }
+            resolve();
+          })
+          .catch(function(err) {
+            // don't expect any exception during encryption
+            reject("Unexpected exception on test case " + tc.id + ": " + err);
+          });
+      })
+      .catch(function(err) {
+        reject("Failed to import key in test case " + tc.id + ": " + err);
+      });
   });
 
   return promise;
@@ -165,41 +186,52 @@ function testAesGcmVectors() {
   var testCase = new goog.testing.TestCase();
   testCase.promiseTimeout = 2 * 1000;
 
-  for (var i = 0; i < tv['testGroups'].length; i++) {
-    var tg = tv['testGroups'][i];
-    var keySizeBit = parseInt(tg['keySize']);
-    var tagSizeBit = parseInt(tg['tagSize']);
-    var ivSizeBit = parseInt(tg['ivSize']);
+  for (var i = 0; i < tv["testGroups"].length; i++) {
+    var tg = tv["testGroups"][i];
+    var keySizeBit = parseInt(tg["keySize"]);
+    var tagSizeBit = parseInt(tg["tagSize"]);
+    var ivSizeBit = parseInt(tg["ivSize"]);
     // Only run the tests if the key size is supported
-    if (SUPPORTED['aesgcm-key-size'].indexOf(keySizeBit) == -1) {
+    if (SUPPORTED["aesgcm-key-size"].indexOf(keySizeBit) == -1) {
       continue;
     }
     // MS Edge only supports IVs of size 96
     if (goog.userAgent.product.EDGE && ivSizeBit != 96) {
       continue;
     }
-    for (var j = 0; j < tg['tests'].length; j++) {
-      var tc = tg['tests'][j];
+    for (var j = 0; j < tg["tests"].length; j++) {
+      var tc = tg["tests"][j];
       // MS Edge doesn't accept 0-length message
-      if (goog.userAgent.product.EDGE && tc['msg'].length == 0) {
+      if (goog.userAgent.product.EDGE && tc["msg"].length == 0) {
         continue;
       }
-      var k = BigInteger.fromHex(tc['key']).toBase64Url(keySizeBit / 8);
-      var aad = TestUtil.hexToArrayBuffer(tc['aad']);
-      var msg = TestUtil.hexToArrayBuffer(tc['msg']);
+      var k = BigInteger.fromHex(tc["key"]).toBase64Url(keySizeBit / 8);
+      var aad = TestUtil.hexToArrayBuffer(tc["aad"]);
+      var msg = TestUtil.hexToArrayBuffer(tc["msg"]);
       var iv;
       if (ivSizeBit == 0) {
         iv = new Uint8Array([]).buffer;
       } else {
-        iv = BigInteger.fromHex(tc['iv']).toArrayBuffer(ivSizeBit / 8);
+        iv = BigInteger.fromHex(tc["iv"]).toArrayBuffer(ivSizeBit / 8);
       }
-      var ct = tc['ct'];
-      var tag = tc['tag'];
-      var result = tc['result'];
-      var tcId = tc['tcId'];
-      var test = new AesGcmTestCase(tcId, k, keySizeBit, tag, tagSizeBit, iv,
-                                    ivSizeBit, aad, msg, ct, result);
-      testCase.addNewTest('Test ' + tcId, AesGcm.testEncrypt, test);
+      var ct = tc["ct"];
+      var tag = tc["tag"];
+      var result = tc["result"];
+      var tcId = tc["tcId"];
+      var test = new AesGcmTestCase(
+        tcId,
+        k,
+        keySizeBit,
+        tag,
+        tagSizeBit,
+        iv,
+        ivSizeBit,
+        aad,
+        msg,
+        ct,
+        result
+      );
+      testCase.addNewTest("Test " + tcId, AesGcm.testEncrypt, test);
     }
   }
 
